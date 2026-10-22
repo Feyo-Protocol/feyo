@@ -8,6 +8,6 @@
     "incremental": false,
     "plugins": []
   },
-  "include": ["src/components/payment/**/*.ts", "src/components/payment/**/*.tsx", "tests/**/*.tsx"],
+  "include": ["src/components/payment/**/*.ts", "src/components/payment/**/*.tsx", "src/app/docs/search.ts", "tests/**/*.tsx"],
   "exclude": ["node_modules", ".test-build"]
 }

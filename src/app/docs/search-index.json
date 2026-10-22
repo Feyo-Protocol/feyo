@@ -1,0 +1,188 @@
+[
+  {
+    "href": "/docs",
+    "title": "Documentation",
+    "section": "",
+    "summary": "Feyo is an independent, open-source project building Stellar-powered stablecoin payment infrastructure for products, developers, and AI agents."
+  },
+  {
+    "href": "/docs#start-here",
+    "title": "Documentation",
+    "section": "Start here",
+    "summary": "Getting started — understand the repository and current development workflow."
+  },
+  {
+    "href": "/docs#what-feyo-is-building",
+    "title": "Documentation",
+    "section": "What Feyo is building",
+    "summary": "Feyo aims to make stablecoin payments easier to integrate without hiding the important parts: authorization, transaction identity, status verification, and operational boundari"
+  },
+  {
+    "href": "/docs#status-vocabulary",
+    "title": "Documentation",
+    "section": "Status vocabulary",
+    "summary": "Implemented: present in this repository and verified by the project checks."
+  },
+  {
+    "href": "/docs/api",
+    "title": "Developer API",
+    "section": "",
+    "summary": "The Feyo developer API is a planned interface for applications that need to create payment intents and read their verifiable status."
+  },
+  {
+    "href": "/docs/api#proposed-shape",
+    "title": "Developer API",
+    "section": "Proposed shape",
+    "summary": "The API is expected to center on resources such as:"
+  },
+  {
+    "href": "/docs/api#design-principles",
+    "title": "Developer API",
+    "section": "Design principles",
+    "summary": "Make authorization explicit and inspectable."
+  },
+  {
+    "href": "/docs/architecture",
+    "title": "Architecture",
+    "section": "",
+    "summary": "Feyo is designed as a set of explicit boundaries around a payment intent. A request should be understandable before it is authorized, and its final state should be verifiable a"
+  },
+  {
+    "href": "/docs/architecture#intended-flow",
+    "title": "Architecture",
+    "section": "Intended flow",
+    "summary": "A product or agent creates a payment intent."
+  },
+  {
+    "href": "/docs/architecture#system-boundaries",
+    "title": "Architecture",
+    "section": "System boundaries",
+    "summary": ""
+  },
+  {
+    "href": "/docs/architecture#trust-model",
+    "title": "Architecture",
+    "section": "Trust model",
+    "summary": "Feyo should not need to hold a user's private key to coordinate a payment. Authorization, signing, provider access, and verification must remain separable so that each can be r"
+  },
+  {
+    "href": "/docs/contributing",
+    "title": "Contributing",
+    "section": "",
+    "summary": "Feyo is an independent startup and open-source project. Small, well-scoped changes are welcome while the architecture is still taking shape."
+  },
+  {
+    "href": "/docs/contributing#before-you-start",
+    "title": "Contributing",
+    "section": "Before you start",
+    "summary": "Read the repository CONTRIBUTING.md, SECURITY.md, and Code of Conduct."
+  },
+  {
+    "href": "/docs/contributing#a-good-pull-request",
+    "title": "Contributing",
+    "section": "A good pull request",
+    "summary": "explains the user or maintainer problem;"
+  },
+  {
+    "href": "/docs/getting-started",
+    "title": "Getting started",
+    "section": "",
+    "summary": "This repository contains the Feyo web application and its documentation foundation. The project is intentionally early-stage: the current working surface is the Next.js applica"
+  },
+  {
+    "href": "/docs/getting-started#prerequisites",
+    "title": "Getting started",
+    "section": "Prerequisites",
+    "summary": "Node.js 20 or newer"
+  },
+  {
+    "href": "/docs/getting-started#run-locally",
+    "title": "Getting started",
+    "section": "Run locally",
+    "summary": "Open http://localhost:3000. The documentation is available at /docs."
+  },
+  {
+    "href": "/docs/getting-started#useful-checks",
+    "title": "Getting started",
+    "section": "Useful checks",
+    "summary": "npm run docs:check"
+  },
+  {
+    "href": "/docs/getting-started#repository-shape",
+    "title": "Getting started",
+    "section": "Repository shape",
+    "summary": "The app uses the Next.js App Router. Documentation pages live beside the app at src/app/docs//page.mdx, the shared MDX component mapping is in src/mdx-components.tsx, and the d"
+  },
+  {
+    "href": "/docs/getting-started#important-boundary",
+    "title": "Getting started",
+    "section": "Important boundary",
+    "summary": "Do not add live payouts, custody of user private keys, or claims about unimplemented API/MCP behavior without a reviewed implementation and tests. Read Contributing before open"
+  },
+  {
+    "href": "/docs/mcp",
+    "title": "MCP server",
+    "section": "",
+    "summary": "Feyo plans to expose carefully scoped payment workflows through an MCP server so AI agents can work with payment intents without receiving unrestricted access to funds."
+  },
+  {
+    "href": "/docs/mcp#planned-tool-categories",
+    "title": "MCP server",
+    "section": "Planned tool categories",
+    "summary": "Create or inspect a payment intent."
+  },
+  {
+    "href": "/docs/mcp#permission-first",
+    "title": "MCP server",
+    "section": "Permission first",
+    "summary": "An agent should be able to explain what it is asking to do before any value moves. Tool design will therefore separate proposing a payment from authorizing and executing it, wi"
+  },
+  {
+    "href": "/docs/roadmap",
+    "title": "Roadmap",
+    "section": "",
+    "summary": "Feyo is deliberately transparent about what exists today and what still needs engineering."
+  },
+  {
+    "href": "/docs/roadmap#implemented",
+    "title": "Roadmap",
+    "section": "Implemented",
+    "summary": "Next.js application foundation."
+  },
+  {
+    "href": "/docs/roadmap#work-in-progress",
+    "title": "Roadmap",
+    "section": "Work in progress",
+    "summary": "Refining the product model for permission-based payment execution."
+  },
+  {
+    "href": "/docs/roadmap#planned",
+    "title": "Roadmap",
+    "section": "Planned",
+    "summary": "Human-facing payment application flows."
+  },
+  {
+    "href": "/docs/stellar",
+    "title": "Stellar",
+    "section": "",
+    "summary": "Stellar is the planned settlement network for Feyo. Its low-cost, fast transactions and stablecoin ecosystem make it a strong fit for payment infrastructure, while the applicat"
+  },
+  {
+    "href": "/docs/stellar#planned-transaction-lifecycle",
+    "title": "Stellar",
+    "section": "Planned transaction lifecycle",
+    "summary": "Feyo will model a payment from intent to verification:"
+  },
+  {
+    "href": "/docs/stellar#current-status",
+    "title": "Stellar",
+    "section": "Current status",
+    "summary": "The repository includes Stellar SDK dependencies for future integration, but this documentation task does not implement or claim real Stellar payment transactions. No private k"
+  },
+  {
+    "href": "/docs/stellar#safety-notes",
+    "title": "Stellar",
+    "section": "Safety notes",
+    "summary": "Network, asset issuer, destination, and amount must be treated as security-sensitive inputs. Any future integration needs test coverage for malformed addresses, wrong-network a"
+  }
+]

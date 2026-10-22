@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import DocsSearch from "./DocsSearch";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
@@ -28,11 +29,12 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <header className="border-b border-[var(--line)] bg-[var(--background)]/90 px-5 py-4 backdrop-blur sm:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 sm:flex-nowrap">
           <Link href="/" className="text-xl font-bold tracking-tight">feyo<span className="text-[var(--accent)]">.</span></Link>
-          <div className="flex items-center gap-4 text-sm font-semibold text-[var(--muted)]">
+          <div className="flex w-full min-w-0 items-center gap-3 text-sm font-semibold text-[var(--muted)] sm:ml-auto sm:w-auto">
+            <DocsSearch />
             <a href="https://github.com/Feyo-Protocol/feyo" target="_blank" rel="noreferrer" className="hidden hover:text-[var(--foreground)] sm:block">GitHub ↗</a>
-            <button type="button" className="rounded-lg border border-[var(--line)] px-3 py-2 sm:hidden" aria-expanded={open} aria-controls="mobile-docs-nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
+            <button type="button" className="shrink-0 rounded-lg border border-[var(--line)] px-3 py-2 sm:hidden" aria-expanded={open} aria-controls="mobile-docs-nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
           </div>
         </div>
         {open && <nav id="mobile-docs-nav" className="mx-auto mt-4 max-w-7xl border-t border-[var(--line)] pt-3 sm:hidden" aria-label="Documentation navigation">{links}</nav>}

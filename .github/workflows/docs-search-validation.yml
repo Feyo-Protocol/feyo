@@ -1,0 +1,36 @@
+name: Docs Search Validation
+
+on:
+  push:
+    branches:
+      - feat/issue-3-accessible-doc-search
+  pull_request:
+    paths:
+      - 'src/app/docs/**'
+      - 'scripts/generate-docs-search-index.mjs'
+      - 'tests/docs-search.test.tsx'
+      - 'tsconfig.test.json'
+      - 'package.json'
+      - '.github/workflows/docs-search-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  docs-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run docs:search:check
+      - run: npm run docs:check
+      - run: npm run lint
+      - run: npm test
+      - run: npx next typegen
+      - run: npx tsc --noEmit
+      - run: npm run build

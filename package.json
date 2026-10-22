@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "docs:check": "node scripts/check-docs-links.mjs",
+    "docs:search:generate": "node scripts/generate-docs-search-index.mjs",
+    "docs:search:check": "node scripts/generate-docs-search-index.mjs --check",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js"
   },
   "dependencies": {
