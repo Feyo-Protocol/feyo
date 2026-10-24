@@ -177,7 +177,13 @@
     "href": "/docs/stellar#current-status",
     "title": "Stellar",
     "section": "Current status",
-    "summary": "The repository includes Stellar SDK dependencies for future integration, but this documentation task does not implement or claim real Stellar payment transactions. No private k"
+    "summary": "The repository integrates Freighter wallet connection on Stellar Testnet for the /app workspace without initiating payments or transactions. No private keys are stored or manag"
+  },
+  {
+    "href": "/docs/stellar#freighter-setup-and-testnet-smoke-test",
+    "title": "Stellar",
+    "section": "Freighter setup and testnet smoke test",
+    "summary": "To test the wallet connection locally with Freighter:"
   },
   {
     "href": "/docs/stellar#safety-notes",

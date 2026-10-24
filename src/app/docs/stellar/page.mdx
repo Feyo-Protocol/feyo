@@ -16,7 +16,17 @@ Feyo will model a payment from intent to verification:
 
 ## Current status
 
-The repository includes Stellar SDK dependencies for future integration, but this documentation task does not implement or claim real Stellar payment transactions. No private keys are stored or managed by the application as part of this foundation.
+The repository integrates Freighter wallet connection on Stellar Testnet for the `/app` workspace without initiating payments or transactions. No private keys are stored or managed by the application; only the public account address (`G...`) is queried.
+
+## Freighter setup and testnet smoke test
+
+To test the wallet connection locally with Freighter:
+
+1. **Install Freighter**: Download the browser extension from [Freighter](https://www.freighter.app/).
+2. **Switch to Testnet**: Open Freighter settings -> **Network**, and ensure **Test Net** is selected (`Test SDF Network ; September 2015`).
+3. **Fund Test Account**: Generate or fund a test account using [Stellar Friendbot](https://laboratory.stellar.org/#account-creator?network=test). Testnet lumens have no real monetary value.
+4. **Connect in `/app`**: Navigate to `/app` in your browser and select **Connect Freighter**. Approve the connection request in the Freighter dialog.
+5. **Verify Safety Boundaries**: Test connecting with Freighter switched to Mainnet to verify that an unsupported network error is raised safely. Test declining authorization to verify error recovery. Disconnecting resets local session state without falsely claiming wallet permissions were revoked.
 
 ## Safety notes
 
