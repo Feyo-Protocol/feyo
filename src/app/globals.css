@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../components/payment/payment-status.css";
+@import "../components/wallet/wallet-connection.css";
 
 :root {
   --background: #f6f8fc;

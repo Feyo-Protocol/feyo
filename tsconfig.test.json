@@ -8,6 +8,15 @@
     "incremental": false,
     "plugins": []
   },
-  "include": ["src/components/payment/**/*.ts", "src/components/payment/**/*.tsx", "src/app/docs/search.ts", "tests/**/*.tsx"],
+  "include": [
+    "src/components/payment/**/*.ts",
+    "src/components/payment/**/*.tsx",
+    "src/components/wallet/**/*.ts",
+    "src/components/wallet/**/*.tsx",
+    "src/wallet/**/*.ts",
+    "src/app/docs/search.ts",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
   "exclude": ["node_modules", ".test-build"]
 }
