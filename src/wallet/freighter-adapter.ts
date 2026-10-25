@@ -1,5 +1,5 @@
 import * as freighter from "@stellar/freighter-api";
-import { StrKey } from "@stellar/stellar-sdk";
+import { isValidStellarPublicKey } from "../lib/stellar/address";
 import {
   STELLAR_TESTNET_NAME,
   STELLAR_TESTNET_PASSPHRASE,
@@ -10,6 +10,8 @@ import {
   type WalletState,
 } from "./types";
 
+export { isValidStellarPublicKey };
+
 /**
  * Validates if the given network details match the supported Stellar Testnet.
  */
@@ -19,21 +21,6 @@ export function isTestnet(network: string, passphrase?: string): boolean {
   }
   const normalized = network.trim().toUpperCase();
   return normalized === STELLAR_TESTNET_NAME || normalized === "TEST NET";
-}
-
-/**
- * Validates whether an address is a valid Stellar public key (starts with 'G').
- * Rejects private keys ('S...') or malformed addresses.
- */
-export function isValidStellarPublicKey(address: unknown): boolean {
-  if (typeof address !== "string" || !address.startsWith("G") || address.length !== 56) {
-    return false;
-  }
-  try {
-    return StrKey.isValidEd25519PublicKey(address);
-  } catch {
-    return false;
-  }
 }
 
 /**

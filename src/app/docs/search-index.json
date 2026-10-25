@@ -138,6 +138,48 @@
     "summary": "An agent should be able to explain what it is asking to do before any value moves. Tool design will therefore separate proposing a payment from authorizing and executing it, wi"
   },
   {
+    "href": "/docs/payments",
+    "title": "Payment intents",
+    "section": "",
+    "summary": "A payment intent describes what a caller is asking to pay before anything is authorized or submitted. Feyo's intent validation is implemented under src/lib/payments/ with deter"
+  },
+  {
+    "href": "/docs/payments#contract",
+    "title": "Payment intents",
+    "section": "Contract",
+    "summary": "A validated intent records:"
+  },
+  {
+    "href": "/docs/payments#exact-amounts",
+    "title": "Payment intents",
+    "section": "Exact amounts",
+    "summary": "Amounts are accepted only as decimal strings, never JavaScript numbers. They are converted to integer stroops (seven decimal places) with BigInt, so no floating-point rounding "
+  },
+  {
+    "href": "/docs/payments#lifecycle",
+    "title": "Payment intents",
+    "section": "Lifecycle",
+    "summary": "Creating a verified intent requires complete settlement evidence: a matching network, a 64-character transaction hash, a positive ledger, and successful payment-match flags. Dr"
+  },
+  {
+    "href": "/docs/payments#idempotency-requires-server-enforcement",
+    "title": "Payment intents",
+    "section": "Idempotency requires server enforcement",
+    "summary": "The idempotency key in an intent is client-supplied metadata. It does not prevent duplicate requests by itself."
+  },
+  {
+    "href": "/docs/payments#example",
+    "title": "Payment intents",
+    "section": "Example",
+    "summary": "import { createPaymentIntent, createPaymentIntentId } from \"@/lib/payments/intent\";"
+  },
+  {
+    "href": "/docs/payments#boundaries",
+    "title": "Payment intents",
+    "section": "Boundaries",
+    "summary": "This module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. It defines a safe input contract only. Transaction c"
+  },
+  {
     "href": "/docs/roadmap",
     "title": "Roadmap",
     "section": "",
@@ -178,6 +220,12 @@
     "title": "Stellar",
     "section": "Current status",
     "summary": "The repository integrates Freighter wallet connection on Stellar Testnet for the /app workspace without initiating payments or transactions. No private keys are stored or manag"
+  },
+  {
+    "href": "/docs/stellar#read-only-testnet-balances",
+    "title": "Stellar",
+    "section": "Read-only Testnet balances",
+    "summary": "The balance service validates a public address before any request, normalizes native and issued balances, and reports failures explicitly instead of returning partial data. It "
   },
   {
     "href": "/docs/stellar#freighter-setup-and-testnet-smoke-test",

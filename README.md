@@ -27,8 +27,8 @@ git diff --check
 
 ## Project status
 
-- **Implemented:** Next.js app shell, responsive documentation, MDX routes, and contributor foundation.
-- **Work in progress:** payment domain model, permission boundaries, and Stellar integration design.
+- **Implemented:** Next.js app shell, responsive documentation, MDX routes, contributor foundation, read-only Stellar Testnet balance queries, and a validated payment-intent domain contract (no submission).
+- **Work in progress:** permission boundaries, payment execution design, and Stellar transaction construction.
 - **Planned:** developer API, MCP server, verifiable payment execution, and regulated USDC-to-Nigerian-bank payouts.
 
 See the [roadmap](/docs/roadmap) and [contributing guide](/docs/contributing) for more detail.
