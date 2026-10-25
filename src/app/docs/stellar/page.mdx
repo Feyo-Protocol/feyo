@@ -18,6 +18,39 @@ Feyo will model a payment from intent to verification:
 
 The repository integrates Freighter wallet connection on Stellar Testnet for the `/app` workspace without initiating payments or transactions. No private keys are stored or managed by the application; only the public account address (`G...`) is queried.
 
+A read-only Testnet balance service is also implemented under `src/lib/stellar/`. It queries Horizon for public account data and never signs or submits a transaction.
+
+## Read-only Testnet balances
+
+The balance service validates a public address before any request, normalizes native and issued balances, and reports failures explicitly instead of returning partial data. It is **Testnet, read-only**.
+
+```ts
+import { fetchTestnetAccountBalances } from "@/lib/stellar/account-balances";
+
+const result = await fetchTestnetAccountBalances("G...");
+
+if (result.ok) {
+  for (const balance of result.value.balances) {
+    // Native XLM: kind === "native" and code === "XLM".
+    // Issued assets: kind === "issued" with both code and issuer.
+    // Do not assume every issued asset is USDC.
+  }
+} else {
+  // result.error.code distinguishes the failure modes below.
+}
+```
+
+| Error code | Meaning |
+| --- | --- |
+| `invalid_address` | The input is not a valid Stellar public key. No request is made. |
+| `unfunded_account` | Horizon returned 404; the account is not funded on Testnet. |
+| `network_error` | The request could not reach Horizon. |
+| `endpoint_unavailable` | Horizon returned a non-404 error status, available as `httpStatus`. |
+| `malformed_response` | The payload did not match the expected account shape. |
+
+Balances remain decimal strings so no floating-point conversion occurs. Issued assets retain their asset code and issuer, and unsupported asset types (such as liquidity pool shares) are rejected as malformed rather than being given an invented identity. Tests inject a mocked `fetch`; CI requires no live network access.
+
+
 ## Freighter setup and testnet smoke test
 
 To test the wallet connection locally with Freighter:

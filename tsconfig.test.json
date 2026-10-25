@@ -13,6 +13,7 @@
     "src/components/payment/**/*.tsx",
     "src/components/wallet/**/*.ts",
     "src/components/wallet/**/*.tsx",
+    "src/lib/**/*.ts",
     "src/wallet/**/*.ts",
     "src/app/docs/search.ts",
     "tests/**/*.ts",

@@ -1,0 +1,83 @@
+export const metadata = { title: "Payment intents" }
+
+# Payment intents
+
+A payment intent describes what a caller is asking to pay before anything is authorized or submitted. Feyo's intent validation is implemented under `src/lib/payments/` with deterministic tests. It does **not** construct, sign, submit, or verify Stellar transactions.
+
+## Contract
+
+A validated intent records:
+
+- an `intentId` in the form `pi_<8-64 URL-safe characters>`;
+- an exact decimal `amount`;
+- an `asset` that is either native XLM or an issued asset with its code and issuer;
+- a Stellar public key `destination`;
+- an explicit `network` (`testnet` or `public`);
+- `status`, `createdAt`, and an optional `expiresAt`;
+- a client-supplied `idempotencyKey`;
+- settlement `verification` only when the status is `verified`.
+
+Invalid input returns a list of field-level issues with stable codes and actionable messages. Issued assets are never assumed to be USDC, and the issuer is preserved.
+
+## Exact amounts
+
+Amounts are accepted only as decimal strings, never JavaScript numbers. They are converted to integer stroops (seven decimal places) with `BigInt`, so no floating-point rounding is involved.
+
+```ts
+import { parsePaymentAmount } from "@/lib/payments/money";
+
+const amount = parsePaymentAmount("12.50");
+
+if (amount.ok) {
+  amount.value.value;      // "12.5"
+  amount.value.minorUnits; // 125000000n
+}
+```
+
+Zero, negative, non-finite, exponent-notation, and over-precise values are rejected. The parser also enforces the signed 64-bit Stellar amount range.
+
+## Lifecycle
+
+| Status | Meaning |
+| --- | --- |
+| `draft` | Details are being prepared. Nothing has been submitted. |
+| `awaiting_authorization` | Waiting for approval. Authorization is not settlement. |
+| `submitted` | Submission has been reported; network verification is still required. |
+| `confirming` | Awaiting network evidence. Settlement is not verified. |
+| `verified` | Matching network evidence confirms a successful payment. |
+| `failed` | An attempt reported failure; check the network before retrying. |
+| `expired` | The authorization or submission window has passed. |
+
+Creating a `verified` intent requires complete settlement evidence: a matching network, a 64-character transaction hash, a positive ledger, and successful payment-match flags. Draft and authorization statuses cannot claim settlement. As defense in depth, `effectiveStatus()` presents a tampered `verified` intent without evidence as `confirming`.
+
+## Idempotency requires server enforcement
+
+The idempotency key in an intent is **client-supplied metadata**. It does not prevent duplicate requests by itself.
+
+True idempotency requires server-side duplicate prevention: persist the key in a unique record scoped to the caller or merchant, bind it to a request fingerprint, return the original result for an identical replay, and reject a reused key with a different payload. That server-side store is not implemented in this repository.
+
+## Example
+
+```ts
+import { createPaymentIntent, createPaymentIntentId } from "@/lib/payments/intent";
+
+const result = createPaymentIntent({
+  intentId: createPaymentIntentId(),
+  amount: "12.50",
+  asset: { type: "native", code: "XLM" },
+  destination: "G...",
+  network: "testnet",
+  idempotencyKey: "replace-with-a-unique-key",
+  createdAt: new Date().toISOString(),
+});
+
+if (!result.ok) {
+  console.error(result.issues);
+}
+```
+
+Serialized intents are versioned, keep the amount as a decimal string, and are fully re-validated when deserialized.
+
+## Boundaries
+
+This module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. It defines a safe input contract only. Transaction construction, signing, submission, and independent verification remain future work.

@@ -10,6 +10,7 @@ const navigation = [
   { href: "/docs/getting-started", label: "Getting started" },
   { href: "/docs/architecture", label: "Architecture" },
   { href: "/docs/stellar", label: "Stellar" },
+  { href: "/docs/payments", label: "Payment intents" },
   { href: "/docs/api", label: "Developer API" },
   { href: "/docs/mcp", label: "MCP server" },
   { href: "/docs/contributing", label: "Contributing" },
