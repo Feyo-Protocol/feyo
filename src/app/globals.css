@@ -3,6 +3,7 @@
 @import "../components/wallet/wallet-connection.css";
 
 :root {
+  --navy: #0b1426;
   --background: #f6f8fc;
   --foreground: #0b1426;
   --muted: #607087;

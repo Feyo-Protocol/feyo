@@ -1,12 +1,43 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { FreighterProviderApi, WalletState } from "../../wallet/types";
 import { FreighterAdapter, defaultFreighterProvider } from "../../wallet/freighter-adapter";
 
 export interface WalletConnectionProps {
   customProvider?: FreighterProviderApi;
   onStateChange?: (state: WalletState) => void;
+}
+
+export function createWalletConnectHandler(
+  adapter: Pick<FreighterAdapter, "connect">,
+  setState: (state: WalletState) => void,
+  onStateChange?: (state: WalletState) => void,
+  clearNotice?: () => void
+): () => Promise<void> {
+  return async () => {
+    clearNotice?.();
+    const connecting: WalletState = { status: "connecting", account: null, error: null };
+    setState(connecting);
+    onStateChange?.(connecting);
+    try {
+      const nextState = await adapter.connect();
+      setState(nextState);
+      onStateChange?.(nextState);
+    } catch (unexpected) {
+      const nextState: WalletState = {
+        status: "error",
+        account: null,
+        error: {
+          code: "unknown",
+          message: "An unexpected error occurred while connecting to Freighter.",
+          details: unexpected instanceof Error ? unexpected.message : String(unexpected),
+        },
+      };
+      setState(nextState);
+      onStateChange?.(nextState);
+    }
+  };
 }
 
 export function WalletConnection({
@@ -20,12 +51,29 @@ export function WalletConnection({
   const [copied, setCopied] = useState<boolean>(false);
   const [disconnectedNotice, setDisconnectedNotice] = useState<string | null>(null);
 
-  const handleConnect = async () => {
-    setDisconnectedNotice(null);
-    const nextState = await adapter.connect();
-    setWalletState(nextState);
-    onStateChange?.(nextState);
-  };
+  useEffect(() => {
+    if (walletState.status !== "connected") return;
+    let active = true;
+    const poll = async () => {
+      const next = await adapter.refresh();
+      if (active && next !== walletState) {
+        setWalletState(next);
+        onStateChange?.(next);
+      }
+    };
+    const timer = window.setInterval(poll, 2000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [adapter, onStateChange, walletState]);
+
+  const handleConnect = createWalletConnectHandler(
+    adapter,
+    setWalletState,
+    onStateChange,
+    () => setDisconnectedNotice(null)
+  );
 
   const handleDisconnect = () => {
     const nextState = adapter.disconnect();
@@ -126,6 +174,7 @@ export function WalletConnection({
                 {error.code === "not_installed" && "Freighter Not Found"}
                 {error.code === "user_rejected" && "Connection Rejected"}
                 {error.code === "unsupported_network" && "Unsupported Network"}
+                {error.code === "connection_lost" && "Connection Lost"}
                 {error.code === "unknown" && "Connection Error"}
               </strong>
               <p style={{ margin: "4px 0 0" }}>{error.message}</p>

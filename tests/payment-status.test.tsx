@@ -43,6 +43,13 @@ test("only matching successful network evidence permits verification", () => {
   }
 });
 
+test("a locally created draft remains draft and explicitly unverified", () => {
+  const html = renderToStaticMarkup(<PaymentStatus payment={{ state: "draft", source: "local", network: "testnet" }} />);
+  assert.match(html, /Local status only/);
+  assert.match(html, /Nothing has been submitted/);
+  assert.doesNotMatch(html, /Network evidence confirms/);
+});
+
 test("explorer validates the full hash and explicit supported network", () => {
   for (const network of ["public", "testnet"]) {
     assert.equal(explorerUrl(hash.toUpperCase(), network), `https://stellar.expert/explorer/${network}/tx/${hash}`);

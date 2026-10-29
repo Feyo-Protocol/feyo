@@ -63,6 +63,31 @@ export interface FetchTestnetBalancesOptions {
   signal?: AbortSignal;
 }
 
+/** Tracks the latest account request so a late response cannot replace newer UI state. */
+export class LatestBalanceRequest {
+  private sequence = 0;
+  private address: string | null = null;
+
+  begin(address: string): number {
+    this.address = address;
+    this.sequence += 1;
+    return this.sequence;
+  }
+
+  isCurrent(token: number, address: string): boolean {
+    return token === this.sequence && address === this.address;
+  }
+
+  getCurrentAddress(): string | null {
+    return this.address;
+  }
+
+  invalidate(): void {
+    this.sequence += 1;
+    this.address = null;
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

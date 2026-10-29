@@ -211,6 +211,50 @@ export class FreighterAdapter {
     }
   }
 
+  /** Re-reads the authorized public account and network without prompting to sign. */
+  public async refresh(): Promise<WalletState> {
+    if (this.state.status !== "connected" || !this.state.account) return this.state;
+    try {
+      const [addressResult, networkDetails]: [
+        Awaited<ReturnType<FreighterProviderApi["getAddress"]>>,
+        { network: string; networkPassphrase?: string; networkUrl?: string; sorobanRpcUrl?: string; error?: unknown },
+      ] = await Promise.all([
+        this.provider.getAddress(),
+        this.provider.getNetworkDetails ? this.provider.getNetworkDetails() : this.provider.getNetwork(),
+      ]);
+      if (addressResult.error || !addressResult.address) {
+        return this.disconnect();
+      }
+      const network = networkDetails.network || "";
+      const passphrase = networkDetails.networkPassphrase || "";
+      if (!isTestnet(network, passphrase)) {
+        const error = createWalletError(
+          "unsupported_network",
+          `Freighter is set to ${network || "an unsupported network"}. Feyo requires Stellar Testnet (${STELLAR_TESTNET_PASSPHRASE}).`,
+          `Detected passphrase: "${passphrase}"`
+        );
+        this.setState({ status: "error", account: null, error });
+        return this.state;
+      }
+      if (!isValidStellarPublicKey(addressResult.address)) return this.disconnect();
+      const account: WalletAccount = {
+        address: addressResult.address,
+        network: {
+          network,
+          networkPassphrase: passphrase || STELLAR_TESTNET_PASSPHRASE,
+          networkUrl: networkDetails.networkUrl,
+          sorobanRpcUrl: networkDetails.sorobanRpcUrl,
+        },
+      };
+      if (account.address !== this.state.account.address || account.network.networkPassphrase !== this.state.account.network.networkPassphrase) {
+        this.setState({ status: "connected", account, error: null });
+      }
+    } catch {
+      // Temporary extension errors do not erase the last known authorized session.
+    }
+    return this.state;
+  }
+
   /**
    * Resets the local application connection state without claiming that
    * Freighter browser extension permissions were revoked.

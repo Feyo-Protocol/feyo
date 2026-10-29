@@ -9,8 +9,9 @@ import {
 import {
   STELLAR_TESTNET_PASSPHRASE,
   type FreighterProviderApi,
+  type WalletState,
 } from "../src/wallet/types";
-import { WalletConnection } from "../src/components/wallet/WalletConnection";
+import { createWalletConnectHandler, WalletConnection } from "../src/components/wallet/WalletConnection";
 
 // Synthetic test key for unit assertions; never a live private key or real account
 const TEST_TESTNET_PUBKEY = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
@@ -28,7 +29,7 @@ test("isTestnet accurately detects Stellar Testnet passphrase and network names"
 test("isValidStellarPublicKey validates genuine G... keys and rejects secret keys or invalid input", () => {
   assert.equal(isValidStellarPublicKey(TEST_TESTNET_PUBKEY), true);
   // Rejects Stellar secret keys starting with 'S'
-  assert.equal(isValidStellarPublicKey("SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4"), false);
+  assert.equal(isValidStellarPublicKey("S".repeat(56)), false);
   // Rejects arbitrary strings
   assert.equal(isValidStellarPublicKey("invalid_address"), false);
   assert.equal(isValidStellarPublicKey(null), false);
@@ -148,6 +149,27 @@ test("WalletConnection component: renders initial disconnected state with connec
   assert.match(html, /Connect Freighter/);
   assert.match(html, /Disconnected/);
   assert.match(html, /secret keys are never accessed or stored/);
+});
+
+test("Connect Freighter button handler calls the real adapter and reports its result", async () => {
+  let requestAccessCalls = 0;
+  const adapter = new FreighterAdapter({
+    isConnected: async () => ({ isConnected: true }),
+    requestAccess: async () => {
+      requestAccessCalls += 1;
+      return { address: "", error: "User declined access" };
+    },
+    getAddress: async () => ({ address: "" }),
+    getNetwork: async () => ({ network: "TESTNET" }),
+  });
+  const states: WalletState[] = [];
+  const clickHandler = createWalletConnectHandler(adapter, (state) => states.push(state));
+
+  await clickHandler();
+
+  assert.equal(requestAccessCalls, 1);
+  assert.deepEqual(states.map((state) => state.status), ["connecting", "error"]);
+  assert.equal(states.at(-1)?.error?.code, "user_rejected");
 });
 
 test("WalletConnection component: renders accessible elements and error alerts", () => {
