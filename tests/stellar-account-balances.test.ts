@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   STELLAR_TESTNET_HORIZON_URL,
+  LatestBalanceRequest,
   fetchTestnetAccountBalances,
   parseTestnetAccountBalances,
 } from "../src/lib/stellar/account-balances";
@@ -9,6 +10,7 @@ import {
 // Synthetic Testnet public keys for unit assertions; never secret keys.
 const ADDRESS = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
 const ISSUER = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ";
+const OTHER_ADDRESS = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ";
 
 const ACCOUNT_FIXTURE = {
   account_id: ADDRESS,
@@ -70,6 +72,28 @@ test("parseTestnetAccountBalances: normalizes native and issued balances without
   assert.equal(custom.balance, "0.0000001");
 });
 
+test("parseTestnetAccountBalances: accepts an empty balance list for a funded account", () => {
+  const result = parseTestnetAccountBalances({ account_id: ADDRESS, balances: [] }, ADDRESS);
+  assert.equal(result.ok, true);
+  if (result.ok) assert.deepEqual(result.value.balances, []);
+});
+
+test("LatestBalanceRequest: account changes invalidate older in-flight responses", () => {
+  const requests = new LatestBalanceRequest();
+  const first = requests.begin(ADDRESS);
+  const second = requests.begin(OTHER_ADDRESS);
+  assert.equal(requests.isCurrent(first, ADDRESS), false);
+  assert.equal(requests.isCurrent(second, OTHER_ADDRESS), true);
+  assert.equal(requests.isCurrent(second, ADDRESS), false);
+});
+
+test("LatestBalanceRequest: invalidation prevents stale responses after disconnect", () => {
+  const requests = new LatestBalanceRequest();
+  const token = requests.begin(ADDRESS);
+  requests.invalidate();
+  assert.equal(requests.isCurrent(token, ADDRESS), false);
+});
+
 test("parseTestnetAccountBalances: keeps the issuer attached to issued assets", () => {
   const result = parseTestnetAccountBalances(
     {
@@ -100,7 +124,7 @@ test("fetchTestnetAccountBalances: rejects an invalid address before any network
     return jsonResponse(ACCOUNT_FIXTURE);
   };
 
-  const result = await fetchTestnetAccountBalances("SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4", {
+  const result = await fetchTestnetAccountBalances("S".repeat(56), {
     fetchImpl,
   });
 

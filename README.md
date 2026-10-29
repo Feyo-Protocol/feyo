@@ -2,7 +2,7 @@
 
 Feyo is an independent, open-source project building Stellar-powered stablecoin payment infrastructure for web applications, developers, and AI agents.
 
-The repository currently contains the Next.js application and a functional MDX documentation foundation. Payment execution, public developer API endpoints, MCP tools, and Nigerian bank payouts are product direction—not capabilities this repository currently claims to provide.
+The repository contains the Next.js application, a responsive Stellar Testnet workspace, and a functional MDX documentation foundation. The workspace connects to Freighter, reads public balances from Testnet Horizon, and validates local payment drafts. Payment execution, public developer API endpoints, MCP tools, and Nigerian bank payouts are not implemented capabilities.
 
 ## Run locally
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` and the [documentation](http://localhost:3000/docs).
+Visit the [Testnet workspace](http://localhost:3000/app) and the [documentation](http://localhost:3000/docs). Drafts and wallet session state remain in memory and are cleared on reload. Disconnect resets the local session; extension permissions remain managed in the wallet.
 
 ## Verify changes
 
@@ -27,9 +27,9 @@ git diff --check
 
 ## Project status
 
-- **Implemented:** Next.js app shell, responsive documentation, MDX routes, contributor foundation, read-only Stellar Testnet balance queries, and a validated payment-intent domain contract (no submission).
+- **Implemented:** Next.js app shell, responsive documentation, MDX routes, contributor foundation, Freighter Testnet connection, read-only Horizon balance display, exact-decimal local payment draft validation and lifecycle (no submission).
 - **Work in progress:** permission boundaries, payment execution design, and Stellar transaction construction.
-- **Planned:** developer API, MCP server, verifiable payment execution, and regulated USDC-to-Nigerian-bank payouts.
+- **Planned:** transaction construction and permissioned execution, developer API, MCP server, verifiable payment execution, and regulated USDC-to-Nigerian-bank payouts.
 
 See the [roadmap](/docs/roadmap) and [contributing guide](/docs/contributing) for more detail.
 

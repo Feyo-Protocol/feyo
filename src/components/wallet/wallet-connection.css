@@ -158,7 +158,7 @@
 }
 
 .wallet-button-primary:hover:not(:disabled) {
-  opacity: 0.92;
+  background: #172944;
 }
 
 .wallet-button-secondary {
@@ -172,12 +172,15 @@
 }
 
 .wallet-button:disabled {
-  opacity: 0.6;
+  opacity: 1;
+  background: var(--background);
+  color: var(--muted);
+  border-color: var(--line);
   cursor: not-allowed;
 }
 
 .wallet-button:focus-visible {
-  outline: 2px solid var(--navy);
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 

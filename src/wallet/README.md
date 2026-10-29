@@ -12,6 +12,13 @@ Freighter browser extension exclusively on **Stellar Testnet**.
 
 ## Connection States
 
+`connect()` requests Freighter access and validates the public address and Testnet
+passphrase. While connected, `refresh()` re-reads only the authorized address and
+network; the workspace calls it every two seconds to notice account or network
+changes. It requests no signing permission. If the account changes, balances for
+the previous address are discarded and fetched again. If the network changes,
+the session moves to an `unsupported_network` error state.
+
 ```
            ┌──────────────────────┐
            │        idle          │
@@ -55,6 +62,11 @@ Freighter browser extension exclusively on **Stellar Testnet**.
    - Click **Connect Freighter**.
    - Approve the connection prompt in Freighter.
    - Verify that your public address is displayed with the **Stellar Testnet** badge.
+   - Confirm that `/app` loads actual XLM and issued-asset balances from Testnet Horizon, including each issued asset's issuer.
+   - Change the active Freighter account and confirm the previous account's balances disappear while the new public account loads.
+   - Change Freighter to Mainnet while connected and confirm the workspace reports a wrong-network state and hides balances.
+   - Use the local draft form with a valid Testnet recipient and exact decimal amount. Confirm the status remains **Draft** and says the payment has not been submitted.
+   - Try an invalid recipient, zero amount, and an amount with more than seven fractional digits. Confirm actionable field errors appear.
 
 5. **Verify Error States**:
    - **Wrong Network**: Switch Freighter network to **Public / Mainnet** and try connecting. Verify that an `Unsupported Network` warning is displayed explaining that Testnet is required.
@@ -64,3 +76,4 @@ Freighter browser extension exclusively on **Stellar Testnet**.
 6. **Verify Disconnection**:
    - Click **Disconnect**.
    - Confirm that the UI resets to the disconnected state and displays an honest notice that local session state was reset.
+   - Confirm that balances are cleared. No payment signing, broadcasting, or verification is available in this workspace.
