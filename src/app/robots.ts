@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { indexable, siteOrigin } from "@/lib/seo/site";
+import { indexable, siteOrigin } from "../lib/seo/site";
 
 export function createRobots(
   publicUrl: string | undefined = process.env.NEXT_PUBLIC_SITE_URL,
