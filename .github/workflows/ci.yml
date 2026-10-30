@@ -18,7 +18,8 @@ jobs:
       - run: npm run lint
       - run: npm run docs:check
       - run: npm run docs:search:check
-      - run: npm test
+      - name: Unit and component regression tests
+        run: npm test
       - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm run build
