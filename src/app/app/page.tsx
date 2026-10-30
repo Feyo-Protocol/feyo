@@ -1,9 +1,7 @@
 import Workspace from "./Workspace";
+import { workspaceMetadata } from "@/lib/seo/metadata";
 
-export const metadata = {
-  title: "Testnet workspace",
-  description: "A read-only Stellar Testnet balance view and local payment intent workspace.",
-};
+export const metadata = workspaceMetadata;
 
 export default function AppPage() {
   return <Workspace />;
