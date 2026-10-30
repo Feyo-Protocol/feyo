@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { PUBLIC_ROUTES, siteOrigin } from "@/lib/seo/site";
+import { PUBLIC_ROUTES, siteOrigin } from "../lib/seo/site";
 
 export function createSitemap(origin = siteOrigin()): MetadataRoute.Sitemap {
   return PUBLIC_ROUTES.map((path) => ({
