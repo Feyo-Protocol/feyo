@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { rootMetadata } from "@/lib/seo/metadata";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./app/workspace.css";
@@ -13,20 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Feyo — Stellar payment infrastructure",
-    template: "%s · Feyo",
-  },
-  description:
-    "Open-source Stellar payment infrastructure for web apps, developer APIs, and AI agents.",
-  openGraph: {
-    title: "Feyo — Stellar payment infrastructure",
-    description:
-      "An open-source, Stellar-powered foundation for stablecoin payments and programmable financial infrastructure.",
-    type: "website",
-  },
-};
+export const metadata = rootMetadata;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
