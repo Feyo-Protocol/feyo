@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { createRobots } from "../src/app/robots";
-import { createSitemap } from "../src/app/sitemap";
+import { createRobots, createSitemap } from "../src/lib/seo/routes";
 import { docsMetadata, landingMetadata, rootMetadata, workspaceMetadata } from "../src/lib/seo/metadata";
 import { indexable, LOCAL_ORIGIN, parseSiteOrigin, PUBLIC_ROUTES, siteOrigin } from "../src/lib/seo/site";
 

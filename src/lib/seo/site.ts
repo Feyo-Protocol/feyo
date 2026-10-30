@@ -26,5 +26,5 @@ export function indexable(
   deployment: string | undefined = process.env.VERCEL_ENV
 ): boolean {
   const parsed = parseSiteOrigin(value);
-  return parsed !== null && parsed.startsWith("https://") && deployment !== "preview";
+  return parsed !== null && parsed.startsWith("https://") && !["localhost", "127.0.0.1", "[::1]"].includes(new URL(parsed).hostname) && deployment !== "preview";
 }
