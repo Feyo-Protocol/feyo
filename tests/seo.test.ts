@@ -45,6 +45,6 @@ test("each main route has accurate, distinct metadata; /app is noindex", () => {
   assert.equal(landingMetadata.alternates?.canonical, "/");
   assert.equal(workspaceMetadata.alternates?.canonical, "/app");
   assert.deepEqual(workspaceMetadata.robots, { index: false, follow: false });
-  assert.equal(rootMetadata.twitter?.card, "summary_large_image");
+  assert.equal(rootMetadata.twitter && "card" in rootMetadata.twitter ? rootMetadata.twitter.card : undefined, "summary_large_image");
   assert.match(String(workspaceMetadata.description), /cannot sign, send, or settle/);
 });
