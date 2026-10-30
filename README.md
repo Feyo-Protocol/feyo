@@ -57,13 +57,22 @@ npm run lint
 npm run docs:check
 npm run docs:search:check
 npm test
+npm run test:coverage  # Optional coverage report
 npx next typegen
 npx tsc --noEmit
 npm run build
 git diff --check
 ```
 
-Tests cover wallet behavior, balance handling, payment intent validation, payment status rendering, and documentation links and search. Wallet and balance tests use mocks rather than real funds or a live wallet. To serve the production build locally, run `npm start` after `npm run build`.
+Tests use Node's built-in runner, including server-rendered React components. They cover wallet behavior, balance handling, payment intent validation, payment status rendering, SEO/robots/sitemap policies, presentation components, and documentation checks. No live wallet, network, credentials, or funds are needed. Wallet and balance tests use mocks rather than real funds or a live wallet. To serve the production build locally, run `npm start` after `npm run build`.
+
+## Public URL, sitemap, and social previews
+
+Set `NEXT_PUBLIC_SITE_URL` to your **actual HTTPS origin** when deploying publicly (for example, `https://your-own-host.example`). Provide an origin only, with no path, query string, credentials, or guessed production domain. This configures absolute metadata, canonical URLs, and the sitemap.
+
+If the variable is missing or invalid, the metadata base falls back to `http://localhost:3000` **only for local development** and `/robots.txt` disallows indexing. Preview deployments (`VERCEL_ENV=preview`) are also non-indexable. Once the actual HTTPS origin is configured, `/sitemap.xml` lists public landing and documentation pages; the read-only `/app` workspace is excluded from the sitemap, blocked by robots, and marked `noindex`.
+
+The generated `/opengraph-image` is a lightweight branded social image that accurately describes the Testnet balance viewer and local payment drafts, not live payments or bank payouts. Run `npm test` for offline SEO policy regression tests.
 
 ## Architecture and repository layout
 
