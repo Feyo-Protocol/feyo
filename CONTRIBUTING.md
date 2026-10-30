@@ -16,11 +16,14 @@ Thanks for helping build open payment infrastructure. Feyo is early-stage, so cl
 ```bash
 npm run lint          # Run ESLint across application and tests
 npm run docs:check    # Validate internal MDX links, routes, and fragment anchors
-npm test              # Run unit and component test suite
+npm test              # Run offline unit, component and SEO regression tests
+npm run test:coverage # Optional Node built-in coverage report
 npx tsc --noEmit      # Type-check TypeScript files
 npm run build         # Build production Next.js application
 git diff --check      # Check for whitespace and merge conflict markers
 ```
+
+The test suite uses Node's existing runner and server-rendered React components; it requires no wallet, live network, keys, or funds. For example, changing the workspace's `noindex` metadata would fail an SEO regression test. Only set `NEXT_PUBLIC_SITE_URL` to your real HTTPS origin on production.
 
 ## Scope and safety
 
