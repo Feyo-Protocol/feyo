@@ -23,3 +23,7 @@ jobs:
       - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm run build
+      - name: Install Chromium for accessibility tests
+        run: npx playwright install --with-deps chromium
+      - name: Browser navigation and accessibility regression tests
+        run: bash scripts/check-a11y.sh
