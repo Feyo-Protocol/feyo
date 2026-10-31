@@ -3,7 +3,7 @@
 import Link from "next/link";
 import DocsSearch from "./DocsSearch";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 const navigation = [
   { href: "/docs", label: "Overview" },
@@ -20,6 +20,18 @@ const navigation = [
 export default function DocsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onEscape);
+    return () => document.removeEventListener("keydown", onEscape);
+  }, [open]);
   const isActive = (href: string) => pathname === href;
   const links = navigation.map((item) => (
     <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className={`block rounded-lg px-3 py-2 text-sm transition-colors ${isActive(item.href) ? "bg-[var(--accent-soft)] font-bold text-[var(--accent)]" : "text-[var(--muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--foreground)]"}`} aria-current={isActive(item.href) ? "page" : undefined}>
@@ -35,7 +47,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
           <div className="flex w-full min-w-0 items-center gap-3 text-sm font-semibold text-[var(--muted)] sm:ml-auto sm:w-auto">
             <DocsSearch />
             <a href="https://github.com/Feyo-Protocol/feyo" target="_blank" rel="noreferrer" className="hidden hover:text-[var(--foreground)] sm:block">GitHub ↗</a>
-            <button type="button" className="shrink-0 rounded-lg border border-[var(--line)] px-3 py-2 sm:hidden" aria-expanded={open} aria-controls="mobile-docs-nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
+            <button ref={toggleRef} type="button" className="shrink-0 rounded-lg border border-[var(--line)] px-3 py-2 sm:hidden" aria-expanded={open} aria-controls="mobile-docs-nav" onClick={() => setOpen(!open)}>{open ? "Close" : "Menu"}</button>
           </div>
         </div>
         {open && <nav id="mobile-docs-nav" className="mx-auto mt-4 max-w-7xl border-t border-[var(--line)] pt-3 sm:hidden" aria-label="Documentation navigation">{links}</nav>}
