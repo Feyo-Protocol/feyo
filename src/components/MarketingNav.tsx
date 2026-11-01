@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { BrandMark } from "./BrandMark";
 
@@ -19,7 +21,12 @@ export function MarketingNav() {
           <a href="https://github.com/Feyo-Protocol/feyo" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
           <Link className="button button-small button-outline-light" href="/app">Open app <span aria-hidden="true">↗</span></Link>
         </div>
-        <details className="mobile-menu">
+        <details className="mobile-menu" onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.currentTarget.open = false;
+            event.currentTarget.querySelector("summary")?.focus();
+          }
+        }}>
           <summary aria-label="Open navigation menu"><span aria-hidden="true">☰</span><span className="sr-only">Open navigation menu</span></summary>
           <div className="mobile-menu-panel">
             {links.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}
