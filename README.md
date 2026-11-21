@@ -11,6 +11,7 @@ Integrating payments requires more than moving funds: applications need clear au
 - Connect a wallet on Stellar Testnet, with account and network change handling and recoverable connection errors.
 - Read public XLM and issued-asset balances from Testnet Horizon, preserving asset issuer identity and handling loading, unfunded accounts, empty results, and request failures.
 - Validate payment drafts with exact decimal amounts, recipient addresses, and asset details; create and clear local drafts without signing or submission.
+- Independently verify a known Testnet transaction hash against successful Horizon transaction and exact classic-payment operation evidence through a standalone read-only library.
 - Browse responsive MDX documentation with navigation and search.
 
 Wallet session state and drafts stay in memory and clear on page reload. Disconnect resets the local wallet session; extension permissions remain managed in the wallet.
@@ -23,13 +24,13 @@ Wallet session state and drafts stay in memory and clear on page reload. Disconn
 | Account balances and payment drafts | Implemented | Read-only balances and local validation; no funds sent |
 | MDX docs, search, and CI checks | Implemented | Developer documentation and automated validation |
 | Authorization model and execution contracts | In progress | Product and interface design, not an execution service |
-| Stellar transaction lifecycle | Planned | Construction, explicit signing, submission, and network verification |
+| Stellar transaction lifecycle | In progress | Read-only Testnet verification implemented; construction, signing, and submission remain unimplemented |
 | Public payment API and MCP payment tools | Planned | Developer and agent integrations |
 | Nigerian bank payouts | Planned | Requires regulated providers and reviewed integrations |
 
 ## Local setup
 
-Requires Git, **Node.js 20.9 or newer** (the Next.js minimum), and npm. CI currently uses Node.js 20. Use `npm ci` to install the versions recorded in the lockfile.
+Requires Git, **Node.js 22.13 or newer**, and npm. The locked Stellar SDK requires Node.js 22.12+, and the complete locked dependency graph is supported on Node.js 22.13+. CI and `.nvmrc` use Node.js 22.23.3. Use `npm ci` to install the versions recorded in the lockfile.
 
 ```bash
 git clone https://github.com/Feyo-Protocol/feyo.git
@@ -61,10 +62,12 @@ npm run test:coverage  # Optional coverage report
 npx next typegen
 npx tsc --noEmit
 npm run build
+npm run test:browser:install
+npm run test:browser
 git diff --check
 ```
 
-Tests use Node's built-in runner, including server-rendered React components. They cover wallet behavior, balance handling, payment intent validation, payment status rendering, SEO/robots/sitemap policies, presentation components, and documentation checks. No live wallet, network, credentials, or funds are needed. Wallet and balance tests use mocks rather than real funds or a live wallet. To serve the production build locally, run `npm start` after `npm run build`.
+Tests use Node's built-in runner, including server-rendered React components, plus a locked Playwright browser runner. They cover wallet behavior, balance handling, independent payment verification, payment intent validation, payment status rendering, SEO/robots/sitemap policies, presentation components, documentation, keyboard navigation, mobile navigation, and overflow. No live wallet, network, credentials, or funds are needed; Horizon and wallet behavior use deterministic injected fixtures. Run the browser install once after `npm ci`, then run browser tests after the production build. To serve the production build locally, run `npm start` after `npm run build`.
 
 ## Public URL, sitemap, and social previews
 
@@ -83,7 +86,7 @@ src/app/app/           Testnet workspace UI
 src/app/docs/          MDX pages, docs layout, and search
 src/components/        Shared UI, wallet connection, and payment status
 src/wallet/            Read-only wallet adapter and types
-src/lib/stellar/       Public address validation and Testnet balances
+src/lib/stellar/       Testnet identity, balances, and read-only payment verification
 src/lib/payments/      Exact-decimal amounts and payment intent validation
 src/mdx-components.tsx Shared MDX component mapping
 tests/                 Unit and component tests
@@ -113,9 +116,9 @@ Fork the repository, create a focused branch, and make a small, reviewable chang
 
 ## Security and non-custodial design
 
-Feyo's current wallet adapter requests public account access only. The application never requests or stores private keys or recovery phrases and does not request transaction signatures. Public account addresses are sent to Testnet Horizon to retrieve balances.
+Feyo's current wallet adapter requests public account access only. The application never requests or stores private keys or recovery phrases and does not request transaction signatures. Public account addresses and user-supplied transaction hashes may be sent to Testnet Horizon for read-only evidence.
 
-The design keeps authorization, wallet signing, execution, and verification separate. Asset identity includes the issuer, amounts use exact decimal handling, and a local draft must never be treated as settlement evidence. Future payment integrations require explicit permissions, review, and tests.
+The design keeps authorization, wallet signing, execution, and verification separate. Asset identity includes the issuer, amounts use exact decimal handling, and a local draft, signature, or reported submission must never be treated as settlement evidence. Verified UI state requires opaque evidence produced by the Testnet verifier; copying or deserializing verification-shaped flags does not preserve that trust. Future payment integrations require explicit permissions, review, and tests.
 
 Report vulnerabilities privately using the process in [SECURITY.md](SECURITY.md); do not include credentials or user data in public issues.
 

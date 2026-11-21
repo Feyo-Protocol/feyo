@@ -51,7 +51,7 @@
     "href": "/docs/architecture#intended-flow",
     "title": "Architecture",
     "section": "Intended flow",
-    "summary": "A product or agent creates a payment intent."
+    "summary": "Validate a payment intent with exact amount, asset identity, destination, network, and idempotency metadata."
   },
   {
     "href": "/docs/architecture#system-boundaries",
@@ -64,6 +64,12 @@
     "title": "Architecture",
     "section": "Trust model",
     "summary": "Feyo should not need to hold a user's private key to coordinate a payment. Authorization, signing, provider access, and verification must remain separable so that each can be r"
+  },
+  {
+    "href": "/docs/architecture#sequences-fees-time-bounds-and-retries",
+    "title": "Architecture",
+    "section": "Sequences, fees, time bounds, and retries",
+    "summary": "A future builder must fetch a fresh source account sequence and treat it as single-use transaction context. Building advances the SDK account object's in-memory sequence, so ab"
   },
   {
     "href": "/docs/contributing",
@@ -93,7 +99,7 @@
     "href": "/docs/getting-started#prerequisites",
     "title": "Getting started",
     "section": "Prerequisites",
-    "summary": "Node.js 20 or newer"
+    "summary": "Node.js 22.13 or newer (.nvmrc and CI use 22.23.3)"
   },
   {
     "href": "/docs/getting-started#run-locally",
@@ -159,7 +165,7 @@
     "href": "/docs/payments#lifecycle",
     "title": "Payment intents",
     "section": "Lifecycle",
-    "summary": "Creating a verified intent requires complete settlement evidence: a matching network, a 64-character transaction hash, a positive ledger, and successful payment-match flags. Dr"
+    "summary": "Creating a verified intent requires opaque evidence returned directly by the Testnet Horizon verifier. The evidence must match the intent network, destination, exact stroop amo"
   },
   {
     "href": "/docs/payments#idempotency-requires-server-enforcement",
@@ -177,7 +183,7 @@
     "href": "/docs/payments#boundaries",
     "title": "Payment intents",
     "section": "Boundaries",
-    "summary": "This module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. It defines a safe input contract only. Transaction c"
+    "summary": "The intent module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. Transaction construction, signing, and submiss"
   },
   {
     "href": "/docs/roadmap",
@@ -226,6 +232,12 @@
     "title": "Stellar",
     "section": "Read-only Testnet balances",
     "summary": "The balance service validates a public address before any request, normalizes native and issued balances, and reports failures explicitly instead of returning partial data. It "
+  },
+  {
+    "href": "/docs/stellar#read-only-testnet-payment-verification",
+    "title": "Stellar",
+    "section": "Read-only Testnet payment verification",
+    "summary": "verifyTestnetPayment() is locked to the Stellar Testnet passphrase and uses the official Testnet Horizon URL by default. Its network client is injectable so CI can use determin"
   },
   {
     "href": "/docs/stellar#freighter-setup-and-testnet-smoke-test",

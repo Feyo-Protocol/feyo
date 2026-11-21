@@ -6,11 +6,16 @@ Feyo is designed as a set of explicit boundaries around a payment intent. A requ
 
 ## Intended flow
 
-1. A product or agent creates a payment intent.
-2. A permission policy checks what the caller may request.
-3. An authorized executor prepares and submits a Stellar transaction.
-4. A verifier observes the network and records a transaction status.
-5. The caller receives a status it can inspect rather than an opaque success flag.
+1. Validate a payment intent with exact amount, asset identity, destination, network, and idempotency metadata.
+2. Read the source account, recipient readiness, sequence, and current fee context from Testnet infrastructure.
+3. Build a bounded unsigned classic-payment preview that says `Not signed · Not submitted`.
+4. Require deliberate user approval, then recheck the wallet account and Testnet passphrase before asking the wallet to sign.
+5. Treat the wallet signature as authorization only: `Signed · Not submitted`.
+6. Submit through a controlled Testnet boundary and record the exact transaction hash without claiming settlement.
+7. Independently query Horizon for the transaction and its operations.
+8. Present `Verified` only when successful ledger evidence contains the exact expected payment operation.
+
+Only steps 1 and 7-8's standalone read-only verifier exist today. Recipient readiness, unsigned construction, signing, and submission remain separate future milestones.
 
 ## System boundaries
 
@@ -20,11 +25,23 @@ Feyo is designed as a set of explicit boundaries around a payment intent. A requ
 | Payment intent validation | Typed, non-custodial input contract before authorization | Implemented (validation only) |
 | Developer API | Programmatic payment intents and status queries | Planned |
 | MCP server | Agent-facing tools with explicit permissions | Planned |
-| Stellar integration | Read-only Testnet balances implemented; transaction construction and verification planned | Work in progress |
+| Stellar integration | Read-only Testnet balances and independent hash verification implemented; transaction construction and submission absent | Work in progress |
 | Regulated payout providers | USDC-to-Nigerian-bank settlement | Planned |
 
 ## Trust model
 
 Feyo should not need to hold a user's private key to coordinate a payment. Authorization, signing, provider access, and verification must remain separable so that each can be reviewed and replaced independently.
+
+Feyo must never ask for, receive, log, or persist a wallet recovery phrase or secret key. The browser wallet remains the signing boundary. Public addresses, transaction hashes, and ledger activity are public but still privacy-sensitive because they are linkable; logs and analytics should collect no signed XDR or unnecessary wallet/session metadata.
+
+The design fails closed against malformed Horizon data, wrong networks, wrong accounts, asset-code or issuer substitution, amount rounding, stale browser responses, unrelated operations, failed transactions, and caller-fabricated verification flags. Testnet verification currently trusts one configured Horizon view and is not proof of off-chain delivery, fiat payout, or Mainnet settlement.
+
+## Sequences, fees, time bounds, and retries
+
+A future builder must fetch a fresh source account sequence and treat it as single-use transaction context. Building advances the SDK account object's in-memory sequence, so abandoned previews must reload the account before building another transaction. Classic fees are per operation; the preview must show the selected fee in stroops and enforce a reviewed upper bound. Every payment must use a finite time bound so stale authorization expires, and the Testnet passphrase must be supplied explicitly during construction and rechecked before signing.
+
+Submission retries must be hash-centric. Persist an intent fingerprint, idempotency key, signed envelope identity, sequence, and transaction hash before network submission. If Horizon returns a timeout or the connection drops, the outcome is ambiguous: query the exact hash and, if resubmission is required, resend the identical signed envelope. Do not rebuild with a new sequence or create a second signature while the first hash may still land. Only after the original hash is definitively failed or expired, and independent verification confirms it did not settle, may a deliberate new attempt load a fresh sequence and receive a new attempt identifier.
+
+`Submitted` means only that a submission call was attempted or acknowledged. `Confirming` means the exact hash is awaiting trustworthy evidence. Neither state is `Verified`.
 
 This page describes the target architecture, not a claim that those components are already running in production.

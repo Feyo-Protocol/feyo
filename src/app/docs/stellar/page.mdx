@@ -18,7 +18,7 @@ Feyo will model a payment from intent to verification:
 
 The repository integrates Freighter wallet connection on Stellar Testnet for the `/app` workspace without initiating payments or transactions. No private keys are stored or managed by the application; only the public account address (`G...`) is queried.
 
-A read-only Testnet balance service is also implemented under `src/lib/stellar/`. It queries Horizon for public account data and never signs or submits a transaction.
+A read-only Testnet balance service is also implemented under `src/lib/stellar/`. It queries Horizon for public account data and never signs or submits a transaction. A separate payment verifier can inspect a known transaction hash, but Feyo still cannot construct, sign, or submit that transaction.
 
 ## Read-only Testnet balances
 
@@ -49,6 +49,26 @@ if (result.ok) {
 | `malformed_response` | The payload did not match the expected account shape. |
 
 Balances remain decimal strings so no floating-point conversion occurs. Issued assets retain their asset code and issuer, and unsupported asset types (such as liquidity pool shares) are rejected as malformed rather than being given an invented identity. Tests inject a mocked `fetch`; CI requires no live network access.
+
+## Read-only Testnet payment verification
+
+`verifyTestnetPayment()` is locked to the Stellar Testnet passphrase and uses the official Testnet Horizon URL by default. Its network client is injectable so CI can use deterministic evidence without funds or a live endpoint.
+
+Verification requires both a successful transaction record and a successful classic `payment` operation in that transaction. The operation must exactly match the expected source, destination, integer stroop amount, and asset identity. Issued assets match both code and issuer. A successful but unrelated transaction is `mismatched`, not verified.
+
+Typed outcomes keep uncertainty explicit:
+
+| Outcome | Meaning |
+| --- | --- |
+| `verified` | Successful ledger transaction and one exact payment operation matched. |
+| `not_found` | Horizon does not currently record the hash; it may be pending or absent. |
+| `failed` | Horizon recorded the transaction as failed. |
+| `mismatched` | The transaction succeeded, but no payment operation matched every expected field. |
+| `invalid_request` | Hash, account, amount, asset, or network input was rejected before lookup. |
+| `unavailable` | Transaction or operation evidence could not be retrieved. |
+| `malformed` | Horizon returned an unexpected payload, so verification failed closed. |
+
+Verified evidence has runtime provenance: a plain object, copied object, serialized object, or caller-provided `paymentMatched` boolean cannot authorize the `Verified` UI state. Persisted records must be reverified against Horizon before they can regain verified status. A request guard is available so account, hash, or intent changes invalidate stale asynchronous responses.
 
 
 ## Freighter setup and testnet smoke test

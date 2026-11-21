@@ -2,7 +2,7 @@ export const metadata = { title: "Payment intents" }
 
 # Payment intents
 
-A payment intent describes what a caller is asking to pay before anything is authorized or submitted. Feyo's intent validation is implemented under `src/lib/payments/` with deterministic tests. It does **not** construct, sign, submit, or verify Stellar transactions.
+A payment intent describes what a caller is asking to pay before anything is authorized or submitted. Feyo's intent validation is implemented under `src/lib/payments/` with deterministic tests. It does **not** construct, sign, or submit Stellar transactions. Independent read-only Testnet verification is a separate module under `src/lib/stellar/`.
 
 ## Contract
 
@@ -48,7 +48,9 @@ Zero, negative, non-finite, exponent-notation, and over-precise values are rejec
 | `failed` | An attempt reported failure; check the network before retrying. |
 | `expired` | The authorization or submission window has passed. |
 
-Creating a `verified` intent requires complete settlement evidence: a matching network, a 64-character transaction hash, a positive ledger, and successful payment-match flags. Draft and authorization statuses cannot claim settlement. As defense in depth, `effectiveStatus()` presents a tampered `verified` intent without evidence as `confirming`.
+Creating a `verified` intent requires opaque evidence returned directly by the Testnet Horizon verifier. The evidence must match the intent network, destination, exact stroop amount, asset code, and issuer. Caller-created booleans and verification-shaped objects are rejected. Draft, signature, and reported submission statuses cannot claim settlement. As defense in depth, `effectiveStatus()` presents a tampered `verified` intent without trusted evidence as `confirming`.
+
+Verifier evidence intentionally loses its trusted runtime provenance when copied or deserialized. A stored payment may preserve public facts for display or audit, but it must be checked against Horizon again before the application presents it as currently verified.
 
 ## Idempotency requires server enforcement
 
@@ -80,4 +82,4 @@ Serialized intents are versioned, keep the amount as a decimal string, and are f
 
 ## Boundaries
 
-This module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. It defines a safe input contract only. Transaction construction, signing, submission, and independent verification remain future work.
+The intent module does not submit RPC calls, move funds, store private keys, automate a faucet, or claim production availability. Transaction construction, signing, and submission remain future work. The implemented verifier is observation-only and cannot move funds.
