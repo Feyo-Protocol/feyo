@@ -37,3 +37,8 @@ and indicators are static even without reduced-motion preferences.
 
 Run `npm test` for deterministic server-rendered component and evidence tests.
 Synthetic hashes exist only in test input, never in a shipped demo or fixture.
+
+`PaymentVerification` is the separate `/app` lookup controller. It prepares
+user-facing expected-payment fields through the shared verifier module, applies
+the bounded verifier, aborts stale work, and renders outcome/evidence details.
+It does not change `PaymentStatus` into a network or execution component.

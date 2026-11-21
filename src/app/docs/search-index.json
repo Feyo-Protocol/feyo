@@ -198,10 +198,10 @@
     "summary": "Responsive landing page, MDX developer documentation and search."
   },
   {
-    "href": "/docs/roadmap#in-review-independent-read-only-verification",
+    "href": "/docs/roadmap#pending-review-user-facing-read-only-verification",
     "title": "Roadmap",
-    "section": "In review — independent read-only verification",
-    "summary": "PR #30 adds a read-only Testnet Horizon transaction verifier and aligns runtime and browser test dependencies. This work has passed CI but is not yet merged or deployed as of N"
+    "section": "Pending review — user-facing read-only verification",
+    "summary": "The current Issue #28 change implements a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessib"
   },
   {
     "href": "/docs/roadmap#next-trustworthy-testnet-payment-preparation",
@@ -256,6 +256,12 @@
     "title": "Stellar",
     "section": "Read-only Testnet payment verification",
     "summary": "verifyTestnetPayment() is locked to the Stellar Testnet passphrase and uses the official Testnet Horizon URL by default. Its network client is injectable so CI can use determin"
+  },
+  {
+    "href": "/docs/stellar#optional-live-public-evidence-check",
+    "title": "Stellar",
+    "section": "Optional live public-evidence check",
+    "summary": "The default tests use deterministic fixtures. To manually check a genuine public Testnet payment without creating or funding one, provide its public ledger fields and run:"
   },
   {
     "href": "/docs/stellar#freighter-setup-and-testnet-smoke-test",

@@ -5,7 +5,14 @@ export default defineConfig({
   testMatch: '*.spec.mjs',
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 1 : undefined,
-  use: { baseURL: 'http://127.0.0.1:3100', browserName: 'chromium', trace: 'retain-on-failure' },
+  use: {
+    baseURL: 'http://127.0.0.1:3100',
+    browserName: 'chromium',
+    trace: 'retain-on-failure',
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
+      : undefined
+  },
   webServer: {
     command: 'npm run start -- --hostname 127.0.0.1 --port 3100',
     url: 'http://127.0.0.1:3100',

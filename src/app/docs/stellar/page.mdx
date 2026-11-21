@@ -18,7 +18,7 @@ Feyo will model a payment from intent to verification:
 
 The repository integrates Freighter wallet connection on Stellar Testnet for the `/app` workspace without initiating payments or transactions. No private keys are stored or managed by the application; only the public account address (`G...`) is queried.
 
-A read-only Testnet balance service is also implemented under `src/lib/stellar/`. It queries Horizon for public account data and never signs or submits a transaction. A separate payment verifier can inspect a known transaction hash, but Feyo still cannot construct, sign, or submit that transaction.
+A read-only Testnet balance service is also implemented under `src/lib/stellar/`. It queries Horizon for public account data and never signs or submits a transaction. The `/app` workspace can also inspect a known transaction hash against user-supplied expected payment details, but Feyo still cannot construct, sign, or submit that transaction.
 
 ## Read-only Testnet balances
 
@@ -69,6 +69,23 @@ Typed outcomes keep uncertainty explicit:
 | `malformed` | Horizon returned an unexpected payload, so verification failed closed. |
 
 Verified evidence has runtime provenance: a plain object, copied object, serialized object, or caller-provided `paymentMatched` boolean cannot authorize the `Verified` UI state. Persisted records must be reverified against Horizon before they can regain verified status. A request guard is available so account, hash, or intent changes invalidate stale asynchronous responses.
+
+The workspace validates every field before lookup, limits each verification to 10 seconds, allows cancellation, and aborts stale requests when form, wallet, or network context changes. It distinguishes verified, failed, mismatched, not-found, malformed, invalid, and unavailable outcomes. A safe Stellar Expert Testnet link is shown only for a syntactically valid hash when transaction evidence is available.
+
+### Optional live public-evidence check
+
+The default tests use deterministic fixtures. To manually check a genuine public Testnet payment without creating or funding one, provide its public ledger fields and run:
+
+```bash
+FEYO_LIVE_TESTNET_VERIFY=1 \
+FEYO_TESTNET_TRANSACTION_HASH=<64-character-hash> \
+FEYO_TESTNET_SOURCE=<G...> \
+FEYO_TESTNET_DESTINATION=<G...> \
+FEYO_TESTNET_AMOUNT=<exact-decimal> \
+npm run test:live:testnet
+```
+
+For issued assets, also set `FEYO_TESTNET_ASSET_TYPE=issued`, `FEYO_TESTNET_ASSET_CODE`, and `FEYO_TESTNET_ASSET_ISSUER`. All inputs are public and sent only to official Testnet Horizon. Never provide a secret key or recovery phrase.
 
 
 ## Freighter setup and testnet smoke test

@@ -30,9 +30,9 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 
 **Not yet on this baseline:** unsigned transactions, signing, broadcasting, verified production payments, durable transaction history, public payment API, agent tools, Mainnet or bank payouts.
 
-### Proposed milestone: PR #30 — not yet merged or deployed
+### Merged milestone: PR #30
 
-[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) proposes Node runtime and Playwright CI alignment ([#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23)) plus read-only Testnet Horizon operation verification with trusted status integration (**partial** [#28](https://github.com/Feyo-Protocol/feyo/issues/28)). Its reported CI and preview are passing; this is **not** a deployed end-user hash lookup and includes **no live funded transfer or broadcast**. Update this paragraph after verifying a merge and deployment.
+[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) merged Node runtime and Playwright CI alignment ([#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23)) plus read-only Testnet Horizon operation verification with trusted status integration (**partial** [#28](https://github.com/Feyo-Protocol/feyo/issues/28)). The library milestone includes no transaction construction, funded transfer, signing, or broadcast. Production deployment remains a separate evidence state.
 
 ## Phase 1 — trustworthy read-only Testnet workspace
 
@@ -40,7 +40,7 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 
 - [#24](https://github.com/Feyo-Protocol/feyo/issues/24): multiple **session-only** drafts with clear deletion and no fabricated persistence.
 - [#25](https://github.com/Feyo-Protocol/feyo/issues/25): recipient existence, trustline/issued-asset authorization/limits, memo and muxed-account requirements where appropriate.
-- [#28](https://github.com/Feyo-Protocol/feyo/issues/28): finish real UI integration for exact-hash read-only verification, bounded timeouts/backoff, pending vs failure cases and evidence-backed status. The standalone verifier alone does not close this issue.
+- [#28](https://github.com/Feyo-Protocol/feyo/issues/28): complete and review the exact-hash read-only verification UI, bounded timeout/cancellation, pending vs failure cases, accessible browser coverage, and genuine public Testnet observation. The standalone verifier alone did not close this issue; see the handoff for current branch/PR state.
 - Mobile, accessible account/error states and clear explanation of Testnet limitations.
 
 **Exit criteria:** real wallet/browser smoke test, real read-only Horizon observation (using public Testnet data only), deterministic negative tests, no leaked secrets, accessible UX and updated documentation.

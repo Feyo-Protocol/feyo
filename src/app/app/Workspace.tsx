@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WalletConnection } from "@/components/wallet/WalletConnection";
 import { PaymentStatus } from "@/components/payment/PaymentStatus";
+import { PaymentVerification } from "@/components/payment/PaymentVerification";
 import type { PaymentStatusData } from "@/components/payment/status-model";
 import { createPaymentIntent, createPaymentIntentId, type PaymentAsset, type PaymentValidationIssue } from "@/lib/payments/intent";
 import { fetchTestnetAccountBalances, LatestBalanceRequest, type StellarAssetBalance, type StellarBalanceError } from "@/lib/stellar/account-balances";
@@ -28,6 +29,11 @@ export default function Workspace() {
   const [draftSummary, setDraftSummary] = useState<{ amount: string; asset: string; issuer?: string; recipient: string } | null>(null);
 
   const activeAddress = wallet.status === "connected" ? wallet.account?.address : undefined;
+  const verificationContextKey = [
+    wallet.status,
+    wallet.account?.address ?? "no-account",
+    wallet.account?.network.networkPassphrase ?? "no-network",
+  ].join("|");
 
   useEffect(() => {
     const requestGuard = balanceRequest.current;
@@ -102,16 +108,16 @@ export default function Workspace() {
       <header className="workspace-nav">
         <Link className="workspace-brand" href="/"><span>f</span> feyo</Link>
         <nav aria-label="Workspace navigation">
-          <a href="#overview">Overview</a><a href="#balances">Balances</a><a href="#draft">New draft</a>
+          <a href="#overview">Overview</a><a href="#balances">Balances</a><a href="#draft">New draft</a><a href="#verify">Verify</a>
           <Link href="/docs/stellar">Docs</Link>
         </nav>
-        <details className="workspace-mobile-menu"><summary aria-label="Open workspace navigation">Menu</summary><div><a href="#overview">Overview</a><a href="#balances">Balances</a><a href="#draft">New draft</a><Link href="/docs/stellar">Docs</Link></div></details>
+        <details className="workspace-mobile-menu"><summary aria-label="Open workspace navigation">Menu</summary><div><a href="#overview">Overview</a><a href="#balances">Balances</a><a href="#draft">New draft</a><a href="#verify">Verify</a><Link href="/docs/stellar">Docs</Link></div></details>
         <span className="network-pill"><i /> Stellar Testnet</span>
       </header>
 
       <section className="workspace-heading" id="overview">
         <div><p className="workspace-eyebrow">Testnet workspace <span>•</span> Read only</p><h1>Payments, prepared with care.</h1>
-          <p>Review public balances and prepare a payment intent. Nothing here signs, submits, or verifies a transaction.</p></div>
+          <p>Review public balances, prepare a payment intent, and independently verify a known transaction. Nothing here signs or submits a transaction.</p></div>
         <div className="workspace-heading-meta"><span className="meta-label">NETWORK</span><strong>Stellar Testnet</strong><small>Test assets have no monetary value</small></div>
       </section>
 
@@ -142,6 +148,7 @@ export default function Workspace() {
         </section>
 
         <section className="workspace-status" aria-label="Draft lifecycle"><div className="status-intro"><p className="card-kicker">04 / LIFECYCLE</p><h2>Intent status</h2><p>A draft stays local until an execution flow exists.</p></div><PaymentStatus payment={draft} /></section>
+        <PaymentVerification key={verificationContextKey} />
       </div>
       <footer className="workspace-footer"><span>FEYO · OPEN SOURCE STELLAR FINTECH</span><span>Testnet only · No signing · No broadcasting</span><Link href="/docs/roadmap">Product roadmap ↗</Link></footer>
     </main>

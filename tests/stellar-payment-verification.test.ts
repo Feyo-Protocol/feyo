@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  DEFAULT_VERIFICATION_TIMEOUT_MS,
   LatestPaymentVerificationRequest,
   createTestnetHorizonVerificationClient,
   isVerifiedTestnetPaymentEvidence,
+  prepareTestnetPaymentVerification,
   verifyTestnetPayment,
+  verifyTestnetPaymentWithTimeout,
   type ExpectedTestnetPayment,
   type TestnetHorizonVerificationClient,
 } from "../src/lib/stellar/payment-verification";
@@ -377,4 +380,141 @@ test("LatestPaymentVerificationRequest rejects stale account, hash, and invalida
   assert.equal(guard.isCurrent(secondToken, second), true);
   guard.invalidate();
   assert.equal(guard.isCurrent(secondToken, second), false);
+});
+
+test("prepareTestnetPaymentVerification validates every user field before lookup", () => {
+  const invalid = prepareTestnetPaymentVerification({
+    transactionHash: "bad",
+    source: "bad",
+    destination: "also-bad",
+    amount: "1.00000001",
+    assetType: "issued",
+    assetCode: "TOO-LONG-ASSET",
+    issuer: "bad",
+  });
+  assert.equal(invalid.ok, false);
+  if (invalid.ok) return;
+  assert.deepEqual(
+    new Set(invalid.issues.map((issue) => issue.field)),
+    new Set(["transactionHash", "source", "destination", "amount", "assetCode", "issuer"])
+  );
+
+  const prepared = prepareTestnetPaymentVerification({
+    transactionHash: HASH.toUpperCase(),
+    source: SOURCE,
+    destination: DESTINATION,
+    amount: "12.5000000",
+    assetType: "native",
+    assetCode: "ignored",
+    issuer: "ignored",
+  });
+  assert.equal(prepared.ok, true);
+  if (!prepared.ok) return;
+  assert.equal(prepared.expected.transactionHash, HASH);
+  assert.equal(prepared.expected.amountStroops, BigInt(125000000));
+  assert.deepEqual(prepared.expected.asset, { type: "native", code: "XLM" });
+});
+
+test("verifyTestnetPaymentWithTimeout aborts a bounded Horizon request", async () => {
+  let observedAbort = false;
+  const result = await verifyTestnetPaymentWithTimeout(expected(), {
+    timeoutMs: 5,
+    client: client({
+      getTransaction: async (_hash, signal) => new Promise<Response>((_resolve, reject) => {
+        signal?.addEventListener("abort", () => {
+          observedAbort = true;
+          reject(signal.reason);
+        }, { once: true });
+      }),
+    }),
+  });
+  assert.equal(observedAbort, true);
+  assert.equal(result.status, "unavailable");
+  if (result.status === "unavailable") {
+    assert.match(result.message, /timeout/i);
+    assert.match(result.details ?? "", /5ms/);
+  }
+});
+
+test("verifyTestnetPaymentWithTimeout returns at the deadline when a client ignores abort forever", async () => {
+  let observedAbort = false;
+  const startedAt = Date.now();
+  const result = await verifyTestnetPaymentWithTimeout(expected(), {
+    timeoutMs: 10,
+    client: client({
+      getTransaction: async (_hash, signal) => {
+        signal?.addEventListener("abort", () => {
+          observedAbort = true;
+        }, { once: true });
+        return new Promise<Response>(() => undefined);
+      },
+    }),
+  });
+
+  assert.equal(observedAbort, true);
+  assert.ok(Date.now() - startedAt < 500, "deadline must not wait for the injected client");
+  assert.equal(result.status, "unavailable");
+  if (result.status === "unavailable") {
+    assert.match(result.message, /timeout/i);
+    assert.match(result.details ?? "", /10ms/);
+  }
+});
+
+test("verifyTestnetPaymentWithTimeout ignores a verification that resolves after the deadline", async () => {
+  let lateResolutionObserved = false;
+  const result = await verifyTestnetPaymentWithTimeout(expected(), {
+    timeoutMs: 5,
+    client: client({
+      getTransaction: async () => new Promise<Response>((resolve) => {
+        setTimeout(() => {
+          lateResolutionObserved = true;
+          resolve(jsonResponse(transactionFixture));
+        }, 25);
+      }),
+    }),
+  });
+
+  assert.equal(result.status, "unavailable");
+  if (result.status === "unavailable") assert.match(result.message, /timeout/i);
+  await new Promise((resolve) => setTimeout(resolve, 35));
+  assert.equal(lateResolutionObserved, true);
+  assert.equal(result.status, "unavailable");
+});
+
+test("verifyTestnetPaymentWithTimeout consumes a client rejection after the deadline", async () => {
+  let lateRejectionObserved = false;
+  const result = await verifyTestnetPaymentWithTimeout(expected(), {
+    timeoutMs: 5,
+    client: client({
+      getTransaction: async () => new Promise<Response>((_resolve, reject) => {
+        setTimeout(() => {
+          lateRejectionObserved = true;
+          reject(new Error("late client rejection"));
+        }, 25);
+      }),
+    }),
+  });
+
+  assert.equal(result.status, "unavailable");
+  if (result.status === "unavailable") assert.match(result.message, /timeout/i);
+  await new Promise((resolve) => setTimeout(resolve, 35));
+  assert.equal(lateRejectionObserved, true);
+  assert.equal(result.status, "unavailable");
+});
+
+test("verifyTestnetPaymentWithTimeout forwards caller cancellation", async () => {
+  const controller = new AbortController();
+  const pending = verifyTestnetPaymentWithTimeout(expected(), {
+    timeoutMs: DEFAULT_VERIFICATION_TIMEOUT_MS,
+    signal: controller.signal,
+    client: client({
+      getTransaction: async (_hash, signal) => new Promise<Response>((_resolve, reject) => {
+        signal?.addEventListener("abort", () => reject(signal.reason), { once: true });
+      }),
+    }),
+  });
+  controller.abort(new DOMException("Context changed.", "AbortError"));
+  const result = await pending;
+  assert.equal(result.status, "unavailable");
+  if (result.status === "unavailable") assert.match(result.details ?? "", /Context changed/);
 });
