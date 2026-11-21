@@ -2,7 +2,7 @@
 
 **Snapshot:** 2026-11-21. **Repository:** https://github.com/Feyo-Protocol/feyo. **Website:** https://feyo-silk.vercel.app/. **Public docs:** https://feyo-silk.vercel.app/docs. **Rules:** `/AGENTS.md`, `/SECURITY.md` and `/CONTRIBUTING.md`.
 
-> **IMPORTANT: State is date-scoped.** As of the 2026-11-21 remote check, `main` was `6d69c3f285b09e17f88e9e7f30859e8fe3e6ba3c` and no PR was open. The safe-verification work described below is **local, uncommitted, unpushed, unreviewed, unmerged and undeployed**. Check GitHub and `git status` before treating any of it as current. Local checks are not GitHub CI evidence.
+> **IMPORTANT: State is date-scoped.** As of the 2026-11-21 remote check, `main` was `6d69c3f285b09e17f88e9e7f30859e8fe3e6ba3c`. Safe-verification [PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) is **open and pushed, but unreviewed, unmerged and not deployed to production**. GitHub CI, docs-search validation and the automatic Vercel preview were still in progress when this snapshot was written. Check the PR before treating any result as current.
 
 ## 1. Why Feyo exists
 
@@ -29,9 +29,9 @@ Feyo is a maintained, independent, non-custodial Stellar payment product for hum
 
 The published app must not claim it can send money while it is still a balance viewer and draft creator.
 
-## 3. Local safe-verification milestone (inspected 2026-11-21)
+## 3. Pushed safe-verification milestone (inspected 2026-11-21)
 
-- Branch: `codex/issues-22-23-28-safe-verification`; base main SHA: `6d69c3f`.
+- Branch: `codex/issues-22-23-28-safe-verification`; implementation commit: `b073ce5`; base main SHA: `6d69c3f`; PR: [#30](https://github.com/Feyo-Protocol/feyo/pull/30).
 - Scope: [#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23), [#28](https://github.com/Feyo-Protocol/feyo/issues/28).
 - Runtime: Node >=22.13, `.nvmrc` and both workflows pinned to 22.23.3; Playwright pinned to 1.56.1, browser CI pinned to Ubuntu 24.04.
 - New files: `src/lib/stellar/network.ts`, `src/lib/stellar/payment-verification.ts`, `tests/stellar-payment-verification.test.ts`, `.nvmrc`. Existing CI/config/intent/wallet/status/docs files also updated; inspect `git status` and `git diff --stat` for complete live list.
@@ -73,9 +73,9 @@ Target flow (not all implemented):
 
 ## 5. Issue backlog and dependencies
 
-1. [#22](https://github.com/Feyo-Protocol/feyo/issues/22): Node runtime. **Local milestone implemented, not merged.**
-2. [#23](https://github.com/Feyo-Protocol/feyo/issues/23): Deterministic browser CI. **Local milestone implemented; GitHub confirmation pending.**
-3. [#28](https://github.com/Feyo-Protocol/feyo/issues/28): Read-only payment verification. **Local verifier and trusted `PaymentStatus` adapter/component tests implemented; no `/app` transaction-hash workflow, live Horizon evidence or funded transfer.**
+1. [#22](https://github.com/Feyo-Protocol/feyo/issues/22): Node runtime. **Implemented in open PR #30; not merged.**
+2. [#23](https://github.com/Feyo-Protocol/feyo/issues/23): Deterministic browser CI. **Implemented in open PR #30; exact GitHub browser confirmation pending.**
+3. [#28](https://github.com/Feyo-Protocol/feyo/issues/28): Read-only payment verification. **Verifier and trusted `PaymentStatus` adapter/component tests are in open PR #30; the PR references rather than closes #28 pending maintainer confirmation because no `/app` transaction-hash workflow, live Horizon evidence or funded transfer exists.**
 4. [#25](https://github.com/Feyo-Protocol/feyo/issues/25): Read-only recipient/trustline readiness, including destination existence, authorization, limits and account requirements.
 5. [#26](https://github.com/Feyo-Protocol/feyo/issues/26): Bounded unsigned classic XLM Testnet payment preview. Requires safe sequence/fee/timeout handling and human-visible XDR decoding.
 6. [#27](https://github.com/Feyo-Protocol/feyo/issues/27): Explicit wallet signing authorization for reviewed Testnet envelope, **no submission**; depends on #26.
@@ -103,13 +103,16 @@ Avoid duplicating completed work when using issues #22/#23/#28 after the local P
 
 ## 8. Exact next actions for the next agent
 
-1. Commit the reviewed milestone and both continuity files on `codex/issues-22-23-28-safe-verification`, push without force, and open a normal PR from base `6d69c3f`.
-2. The PR may use `Closes #22` and `Closes #23`. For #28, explain that trusted evidence is integrated into the `PaymentStatus` contract and tests but `/app` has no live hash-verification workflow; close only if maintainers agree that this satisfies the issue's read-only scope, otherwise use `Refs #28`.
-3. Require GitHub CI to pass the exact Node 22.23.3 and Playwright 1.56.1/Chromium install on Ubuntu 24.04 before merge. Do not treat the Ubuntu 26.04 substitute-browser run as equivalent.
-4. Review the unresolved moderate dependency audit and Vercel Node runtime support; keep any Next.js upgrade in a separate reviewed change.
-5. Do not merge or deploy without maintainer approval. After review/merge, update this file with PR number, merge SHA, CI conclusion and deployment state.
-6. Then address #25 or #26 in separate focused PRs while preserving Testnet-only and no-submission boundaries.
+1. Monitor PR #30 until the `checks`, `docs-search`, and Vercel statuses complete. Require the exact Node 22.23.3 and Playwright 1.56.1/Chromium install on Ubuntu 24.04 to pass before merge.
+2. Review the verifier trust boundary and decide whether #28's read-only scope is satisfied by the `PaymentStatus` adapter/component integration or needs a separate live hash-lookup UI. Do not add signing or submission to settle that question.
+3. Review the unresolved moderate dependency audit and Vercel Node runtime support; keep any Next.js upgrade in a separate reviewed change.
+4. Do not merge or deploy to production without maintainer approval. After review/merge, update this file with merge SHA, final CI conclusions and deployment state.
+5. Then address #25 or #26 in separate focused PRs while preserving Testnet-only and no-submission boundaries.
 
 ### Template for updating this handoff after any PR
 
 `YYYY-MM-DD — PR #N — branch/SHA — state (local/pushed/merged/deployed) — exact functionality — tests (fixture vs live) — security/known limitations — next issue/step.`
+
+### Milestone history
+
+- `2026-11-21 — PR #30 — codex/issues-22-23-28-safe-verification@b073ce5 — open/pushed, CI pending, not reviewed/merged/production-deployed — Node/Playwright alignment, read-only Testnet verifier and trusted PaymentStatus contract — local fixture and substitute-browser evidence only — moderate dependency advisories and live-workflow limitations recorded above — next: require exact GitHub CI and maintainer review.`
