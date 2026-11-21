@@ -1,3 +1,8 @@
+import {
+  isVerifiedTestnetPaymentEvidence,
+  type VerifiedTestnetPaymentEvidence,
+} from "../../lib/stellar/payment-verification";
+
 /** Presentation contract only; adapt payment-intent domain types at the caller. */
 export type PaymentStatusState =
   | "draft"
@@ -15,14 +20,8 @@ export interface PaymentStatusData {
   source: "mock" | "local" | "network";
   network?: ExplorerNetwork;
   transactionHash?: string;
-  /** Supplied by a trusted network adapter, never inferred from a submission. */
-  verification?: {
-    network: ExplorerNetwork;
-    transactionHash: string;
-    ledger: number;
-    successful: boolean;
-    paymentMatched: boolean;
-  };
+  /** Opaque runtime evidence produced by the read-only Testnet verifier. */
+  verification?: VerifiedTestnetPaymentEvidence;
 }
 
 export const statusCopy = {
@@ -43,13 +42,27 @@ export function explorerUrl(hash: unknown, network: unknown): string | undefined
 
 export function hasVerification(data: PaymentStatusData): boolean {
   const evidence = data.verification;
-  return data.source === "network" && !!evidence &&
+  return data.source === "network" && isVerifiedTestnetPaymentEvidence(evidence) &&
     !!explorerUrl(data.transactionHash, data.network) &&
     !!explorerUrl(evidence.transactionHash, evidence.network) &&
+    data.network === "testnet" &&
     evidence.network === data.network &&
     evidence.transactionHash.toLowerCase() === data.transactionHash?.toLowerCase() &&
-    Number.isSafeInteger(evidence.ledger) && evidence.ledger > 0 &&
-    evidence.successful === true && evidence.paymentMatched === true;
+    Number.isSafeInteger(evidence.ledger) && evidence.ledger > 0;
+}
+
+/** The only supported adapter from verified network evidence to a verified UI state. */
+export function paymentStatusFromVerifiedEvidence(
+  evidence: VerifiedTestnetPaymentEvidence
+): PaymentStatusData | undefined {
+  if (!isVerifiedTestnetPaymentEvidence(evidence)) return undefined;
+  return {
+    state: "verified",
+    source: "network",
+    network: "testnet",
+    transactionHash: evidence.transactionHash,
+    verification: evidence,
+  };
 }
 
 export function displayState(data: PaymentStatusData): PaymentStatusState {

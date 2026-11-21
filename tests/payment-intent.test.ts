@@ -19,10 +19,17 @@ import {
   type PaymentNetwork,
   type SettlementVerification,
 } from "../src/lib/payments/intent";
+import {
+  verifyTestnetPayment,
+  type ExpectedTestnetPayment,
+  type TestnetHorizonVerificationClient,
+} from "../src/lib/stellar/payment-verification";
+import { STELLAR_TESTNET_PASSPHRASE } from "../src/lib/stellar/network";
 
 // Synthetic Testnet public keys for unit assertions; never secret keys.
 const DESTINATION = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
 const ISSUER = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ";
+const OTHER = "GCQ7SWUVPHZ3URQDBRKURQMZKVMYR6B43MMLC6VK7U3DE2TKN552ZZT3";
 const SECRET_KEY = "S".repeat(56);
 
 const CREATED_AT = "2026-10-25T12:00:00.000Z";
@@ -43,15 +50,50 @@ function validInput(overrides: Partial<CreatePaymentIntentInput> = {}): CreatePa
   };
 }
 
-function verification(overrides: Partial<SettlementVerification> = {}): SettlementVerification {
-  return {
+async function verification(
+  expectedOverrides: Partial<ExpectedTestnetPayment> = {},
+  operationOverrides: Record<string, unknown> = {}
+): Promise<SettlementVerification> {
+  const expected: ExpectedTestnetPayment = {
     network: "testnet",
     transactionHash: TRANSACTION_HASH,
+    source: ISSUER,
+    destination: DESTINATION,
+    amountStroops: BigInt(125000000),
+    asset: { type: "native", code: "XLM" },
+    ...expectedOverrides,
+  };
+  const transaction = {
+    hash: expected.transactionHash,
     ledger: 123456,
     successful: true,
-    paymentMatched: true,
-    ...overrides,
+    created_at: "2026-10-25T12:01:00Z",
+    source_account: expected.source,
+    operation_count: 1,
   };
+  const operation = {
+    id: "123456",
+    transaction_hash: expected.transactionHash,
+    transaction_successful: true,
+    source_account: expected.source,
+    type: "payment",
+    from: expected.source,
+    to: expected.destination,
+    amount: "12.5000000",
+    asset_type: "native",
+    ...operationOverrides,
+  };
+  const response = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+  const client: TestnetHorizonVerificationClient = {
+    horizonUrl: "https://horizon-testnet.stellar.org",
+    networkPassphrase: STELLAR_TESTNET_PASSPHRASE,
+    getTransaction: async () => response(transaction),
+    getOperations: async () => response({ _embedded: { records: [operation] } }),
+  };
+  const result = await verifyTestnetPayment(expected, { client });
+  assert.equal(result.status, "verified");
+  if (result.status !== "verified") throw new Error("Expected verified fixture evidence.");
+  return result.evidence;
 }
 
 function issueFields(result: ReturnType<typeof createPaymentIntent>): string[] {
@@ -253,7 +295,7 @@ test("createPaymentIntent: validates the expiry window", () => {
   assert.equal(valid.intent.expiresAt, "2026-10-26T12:00:00.000Z");
 });
 
-test("createPaymentIntent: verified status requires complete matching settlement evidence", () => {
+test("createPaymentIntent: verified status requires opaque, exactly matching verifier evidence", async () => {
   const missingEvidence = createPaymentIntent(
     validInput({ status: "verified" })
   );
@@ -261,36 +303,38 @@ test("createPaymentIntent: verified status requires complete matching settlement
   if (missingEvidence.ok) return;
   assert.equal(missingEvidence.issues[0].code, "verification_required");
 
-  const mismatchedNetwork = createPaymentIntent(
+  const genuineEvidence = await verification();
+  const fabricatedEvidence = { ...genuineEvidence } as SettlementVerification;
+  const fabricated = createPaymentIntent(
     validInput({
       status: "verified",
-      verification: verification({ network: "public" as PaymentNetwork }),
+      verification: fabricatedEvidence,
     })
   );
-  assert.equal(mismatchedNetwork.ok, false);
-  if (mismatchedNetwork.ok) return;
-  assert.equal(mismatchedNetwork.issues[0].code, "invalid_verification");
+  assert.equal(fabricated.ok, false);
+  if (fabricated.ok) return;
+  assert.equal(fabricated.issues[0].code, "invalid_verification");
 
-  const badHash = createPaymentIntent(
-    validInput({ status: "verified", verification: verification({ transactionHash: "abc" }) })
+  const wrongDestinationEvidence = await verification(
+    { destination: OTHER },
+    { to: OTHER }
   );
-  assert.equal(badHash.ok, false);
+  const wrongDestination = createPaymentIntent(
+    validInput({ status: "verified", verification: wrongDestinationEvidence })
+  );
+  assert.equal(wrongDestination.ok, false);
 
-  const badLedger = createPaymentIntent(
-    validInput({ status: "verified", verification: verification({ ledger: 0 }) })
+  const wrongAmountEvidence = await verification(
+    { amountStroops: BigInt(125000001) },
+    { amount: "12.5000001" }
   );
-  assert.equal(badLedger.ok, false);
-
-  const unconfirmed = createPaymentIntent(
-    validInput({
-      status: "verified",
-      verification: verification({ successful: false as unknown as true }),
-    })
+  const wrongAmount = createPaymentIntent(
+    validInput({ status: "verified", verification: wrongAmountEvidence })
   );
-  assert.equal(unconfirmed.ok, false);
+  assert.equal(wrongAmount.ok, false);
 
   const valid = createPaymentIntent(
-    validInput({ status: "verified", verification: verification() })
+    validInput({ status: "verified", verification: genuineEvidence })
   );
   assert.equal(valid.ok, true);
   if (!valid.ok) return;
@@ -300,9 +344,9 @@ test("createPaymentIntent: verified status requires complete matching settlement
   assert.equal(effectiveStatus(valid.intent), "verified");
 });
 
-test("createPaymentIntent: rejects settlement evidence on non-verified statuses", () => {
+test("createPaymentIntent: rejects settlement evidence on non-verified statuses", async () => {
   const result = createPaymentIntent(
-    validInput({ status: "awaiting_authorization", verification: verification() })
+    validInput({ status: "awaiting_authorization", verification: await verification() })
   );
 
   assert.equal(result.ok, false);

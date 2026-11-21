@@ -4,8 +4,10 @@
  * custodial storage, or transaction signing.
  */
 
-export const STELLAR_TESTNET_PASSPHRASE = "Test SDF Network ; September 2015";
-export const STELLAR_TESTNET_NAME = "TESTNET";
+export {
+  STELLAR_TESTNET_NAME,
+  STELLAR_TESTNET_PASSPHRASE,
+} from "../lib/stellar/network";
 
 export type WalletStatus = "idle" | "connecting" | "connected" | "error";
 

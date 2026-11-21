@@ -2,30 +2,53 @@ export const metadata = { title: "Roadmap" }
 
 # Roadmap
 
-Feyo is deliberately transparent about what exists today and what still needs engineering.
+Feyo is an independent open-source Stellar payments project. We are building it for long-term ecosystem usefulness, not a single event. The phases below describe our **direction**, not guaranteed dates or deployed features.
 
-## Implemented
+Our priority is straightforward: **correct payments, explicit authorization, independent verification, and a good developer experience.** Work is delivered through focused GitHub issues and reviewed pull requests.
 
-- Next.js application foundation.
-- MDX documentation routes and responsive navigation.
-- Open-source contribution, security, and community policy files.
-- CI checks for linting, type checking, and production builds.
-- Responsive Testnet workspace with Freighter connection and account/network change handling.
-- Read-only Testnet Horizon balances for XLM and issued assets, retaining issuer identity and showing empty, unfunded, loading, and request-error states.
-- Testnet-only payment intent draft form with field validation, exact decimal amounts, local draft lifecycle, and no signing or submission.
+## What is in the deployed foundation
 
-## Work in progress
+- Responsive landing page, MDX developer documentation and search.
+- Varial/Freighter public-wallet connection restricted to Stellar Testnet.
+- Read-only XLM and issued-asset balances, preserving the issuer.
+- Exact-decimal validated local drafts and truthful payment status UI.
+- Automated unit, documentation, CI and browser accessibility checks.
 
-- Refining the product model for permission-based payment execution.
-- Defining the developer and agent-facing contracts.
-- Researching Stellar transaction and verification boundaries.
+The current workspace does **not** sign, broadcast, or settle a payment. It has no Mainnet payments, public payment API, MCP payment execution, or bank payouts.
 
-## Planned
+## In review — independent read-only verification
 
-- Broader human-facing payment application flows beyond the local Testnet draft workspace.
-- Tested developer API for payment intents and status queries.
-- Permissioned MCP tools for AI agents.
-- Verifiable Stellar transaction lifecycle support.
-- USDC-to-Nigerian-bank payouts through regulated providers.
+[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) adds a read-only Testnet Horizon transaction verifier and aligns runtime and browser test dependencies. This work has passed CI but is **not yet merged or deployed** as of November 21, 2026. Its library-level verification is not an end-user transaction-hash lookup screen or evidence of a funded Testnet payment.
 
-Dates and milestones will be added when they are backed by an implementation plan. Until then, the status labels above are the source of truth.
+## Next: trustworthy Testnet payment preparation
+
+- Better session-only draft management.
+- Recipient readiness and issued-asset trustline checks.
+- A clear read-only transaction-hash lookup with truthful pending, failed, mismatched and verified states.
+- Browser, accessibility and real-wallet regression coverage.
+
+## Then: explicitly authorized Testnet transactions
+
+1. Preview a bounded unsigned classic Stellar payment with amount, asset, issuer, destination, fee, timeout and network shown.
+2. Ask the connected wallet for explicit user authorization and a signature; signing alone is not submission.
+3. Build a separate controlled submission flow with durable attempts and safe recovery from ambiguous outcomes.
+4. Independently verify the exact transaction and payment operation from network evidence.
+5. Generate privacy-aware receipts only for payments that have actually been verified.
+
+We will demonstrate a funded Testnet transaction and its verifiable hash before claiming end-to-end payment execution. Test assets have no monetary value.
+
+## Longer-term: stablecoins, developers and agents
+
+- Supported Stellar stablecoin payment requests, asset/trustline safety, merchant flows and reconciliation.
+- Developer APIs, typed client examples, access control, idempotency and signed status notifications.
+- Permission-limited agent/MCP capabilities, with human approval and spending policies for financial actions.
+- Potential fee-sponsorship and Stellar smart-wallet integrations after technical/security validation.
+- Exploration of regulated provider-backed off-ramps and broader ecosystem partnerships; **not available today**.
+
+We will revise these priorities based on security requirements, ecosystem feedback, contributor capacity, and proof that the previous milestone works. There are no announced release dates.
+
+## Build with us
+
+Explore [open issues](https://github.com/Feyo-Protocol/feyo/issues), read our [contribution guidelines](/docs/contributing), and follow the [architecture](/docs/architecture) and [payment intent](/docs/payments) documentation. The maintainers review changes through pull requests, with automated tests and clear acceptance criteria.
+
+Detailed engineering planning, dependencies and progress criteria live in the repository's [living product roadmap](https://github.com/Feyo-Protocol/feyo/blob/main/docs/PRODUCT_ROADMAP.md). It will be available on `main` after the documentation update is merged.

@@ -11,14 +11,13 @@ payment-intent domain model. Map the future shared intent model at the call site
 ```
 
 Use `mock` for demonstrations, `local` for locally observed submission, and
-`network` only for results returned by a trusted network adapter. A requested
-`verified` state falls back to `confirming` unless evidence identifies the same
-64-character hexadecimal transaction hash and explicit network, a positive
-integer ledger, successful execution, and a match to the intended payment.
-The adapter must validate the recipient, asset, amount, and relevant payment
-identity before setting `paymentMatched`. A hash alone never proves settlement.
-These checks defend the presentation boundary; caller-supplied evidence is not
-cryptographic proof and must not be populated from untrusted browser input.
+`network` only for results returned by the read-only Horizon verifier. Build a
+verified state with `paymentStatusFromVerifiedEvidence()`. A requested
+`verified` state falls back to `confirming` unless its evidence retains the
+verifier's runtime provenance and identifies the same Testnet transaction hash
+and positive ledger. Plain objects, copied objects, serialized flags, and hashes
+alone never prove settlement. Persisted payments must be reverified before they
+can regain a verified UI state.
 
 Explorer links use StellarExpert's `public` (Mainnet) and `testnet` networks.
 They require a network-sourced hash with valid syntax and an explicit supported

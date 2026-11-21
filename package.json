@@ -2,6 +2,9 @@
   "name": "feyo",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +14,9 @@
     "docs:search:generate": "node scripts/generate-docs-search-index.mjs",
     "docs:search:check": "node scripts/generate-docs-search-index.mjs --check",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",
-    "test:coverage": "tsc -p tsconfig.test.json && node --experimental-test-coverage --test .test-build/tests/*.test.js"
+    "test:coverage": "tsc -p tsconfig.test.json && node --experimental-test-coverage --test .test-build/tests/*.test.js",
+    "test:browser": "playwright test --config playwright.config.mjs",
+    "test:browser:install": "playwright install chromium"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
@@ -24,6 +29,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@tailwindcss/turbopack": "^4",
     "@types/mdx": "^2.0.14",
     "@types/node": "^20",

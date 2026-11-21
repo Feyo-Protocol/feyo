@@ -1,5 +1,8 @@
 import type { Result } from "../result";
 import { isValidStellarPublicKey } from "./address";
+import { STELLAR_TESTNET_HORIZON_URL } from "./network";
+
+export { STELLAR_TESTNET_HORIZON_URL } from "./network";
 
 /**
  * Read-only Stellar Testnet account balance service.
@@ -7,8 +10,6 @@ import { isValidStellarPublicKey } from "./address";
  * This module only queries Horizon for public account data. It does not sign,
  * submit, or sponsor transactions, and it never accepts secret keys.
  */
-
-export const STELLAR_TESTNET_HORIZON_URL = "https://horizon-testnet.stellar.org";
 
 /** Stellar amounts are decimal strings with up to seven fractional digits. */
 const STELLAR_AMOUNT_PATTERN = /^(?:0|[1-9]\d*)(?:\.\d{1,7})?$/;

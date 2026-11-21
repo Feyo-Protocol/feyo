@@ -1,4 +1,8 @@
 import { isValidStellarPublicKey } from "../stellar/address";
+import {
+  isVerifiedTestnetPaymentEvidence,
+  type VerifiedTestnetPaymentEvidence,
+} from "../stellar/payment-verification";
 import { parsePaymentAmount, type PaymentAmount } from "./money";
 
 /**
@@ -30,7 +34,6 @@ export const PAYMENT_INTENT_SERIALIZATION_VERSION = 1;
 
 const INTENT_ID_PATTERN = /^pi_[A-Za-z0-9_-]{8,64}$/;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9_-]{16,128}$/;
-const TRANSACTION_HASH_PATTERN = /^[a-fA-F0-9]{64}$/;
 const ASSET_CODE_PATTERN = /^[A-Za-z0-9]{1,12}$/;
 
 export interface NativePaymentAsset {
@@ -51,13 +54,7 @@ export type PaymentAsset = NativePaymentAsset | IssuedPaymentAsset;
  * Trusted settlement evidence. `verified` is never inferred from a
  * submission; it requires matching network evidence supplied by a verifier.
  */
-export interface SettlementVerification {
-  network: PaymentNetwork;
-  transactionHash: string;
-  ledger: number;
-  successful: true;
-  paymentMatched: true;
-}
+export type SettlementVerification = VerifiedTestnetPaymentEvidence;
 
 export interface PaymentIntent {
   /** Caller-supplied identifier in the form `pi_<8-64 url-safe characters>`. */
@@ -234,44 +231,41 @@ function parseAsset(
 
 function parseVerification(
   value: unknown,
-  network: PaymentNetwork | undefined
+  network: PaymentNetwork | undefined,
+  amount: PaymentAmount | undefined,
+  asset: PaymentAsset | undefined,
+  destination: string | undefined
 ): { ok: true; value: SettlementVerification } | { ok: false; issue: PaymentValidationIssue } {
   const invalid = (message: string): { ok: false; issue: PaymentValidationIssue } => ({
     ok: false,
     issue: { field: "verification", code: "invalid_verification", message },
   });
 
-  if (!isRecord(value)) {
-    return invalid("Settlement verification must be an object.");
+  if (!isVerifiedTestnetPaymentEvidence(value)) {
+    return invalid(
+      "Settlement verification must come directly from the read-only Testnet Horizon verifier; plain objects and serialized flags are not trusted."
+    );
   }
   if (network === undefined || value.network !== network) {
     return invalid("Settlement verification network must match the intent network.");
   }
+  if (amount === undefined || value.amountStroops !== amount.minorUnits.toString()) {
+    return invalid("Settlement verification amount must exactly match the intent amount.");
+  }
+  if (destination === undefined || value.destination !== destination) {
+    return invalid("Settlement verification destination must match the intent destination.");
+  }
   if (
-    typeof value.transactionHash !== "string" ||
-    !TRANSACTION_HASH_PATTERN.test(value.transactionHash)
+    asset === undefined ||
+    value.asset.type !== asset.type ||
+    value.asset.code !== asset.code ||
+    (asset.type === "issued" &&
+      (value.asset.type !== "issued" || value.asset.issuer !== asset.issuer))
   ) {
-    return invalid("Settlement verification requires a 64-character transaction hash.");
-  }
-  if (!Number.isSafeInteger(value.ledger) || (value.ledger as number) <= 0) {
-    return invalid("Settlement verification requires a positive ledger number.");
-  }
-  if (value.successful !== true || value.paymentMatched !== true) {
-    return invalid(
-      "Settlement verification requires successful network evidence matching this payment."
-    );
+    return invalid("Settlement verification asset and issuer must match the intent asset.");
   }
 
-  return {
-    ok: true,
-    value: {
-      network,
-      transactionHash: value.transactionHash.toLowerCase(),
-      ledger: value.ledger as number,
-      successful: true,
-      paymentMatched: true,
-    },
-  };
+  return { ok: true, value };
 }
 
 /**
@@ -416,7 +410,13 @@ export function createPaymentIntent(input: CreatePaymentIntentInput): CreatePaym
           "A verified intent requires settlement evidence (network, transaction hash, ledger and successful payment match).",
       });
     } else {
-      const verificationResult = parseVerification(raw.verification, network);
+      const verificationResult = parseVerification(
+        raw.verification,
+        network,
+        amount,
+        asset,
+        destination
+      );
       if (verificationResult.ok) {
         verification = verificationResult.value;
       } else {
@@ -479,18 +479,23 @@ export function createPaymentIntent(input: CreatePaymentIntentInput): CreatePaym
  * evidence. Authorization or submission alone never satisfies this check.
  */
 export function hasVerifiedSettlement(
-  intent: Pick<PaymentIntent, "network" | "status" | "verification">
+  intent: Pick<
+    PaymentIntent,
+    "network" | "status" | "verification" | "amount" | "asset" | "destination"
+  >
 ): boolean {
   const verification = intent.verification;
   return (
     intent.status === "verified" &&
-    verification !== undefined &&
+    isVerifiedTestnetPaymentEvidence(verification) &&
     verification.network === intent.network &&
-    TRANSACTION_HASH_PATTERN.test(verification.transactionHash) &&
-    Number.isSafeInteger(verification.ledger) &&
-    verification.ledger > 0 &&
-    verification.successful === true &&
-    verification.paymentMatched === true
+    verification.destination === intent.destination &&
+    verification.amountStroops === intent.amount.minorUnits.toString() &&
+    verification.asset.type === intent.asset.type &&
+    verification.asset.code === intent.asset.code &&
+    (intent.asset.type === "native" ||
+      (verification.asset.type === "issued" &&
+        verification.asset.issuer === intent.asset.issuer))
   );
 }
 

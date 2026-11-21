@@ -3,6 +3,8 @@ import { isValidStellarPublicKey } from "../lib/stellar/address";
 import {
   STELLAR_TESTNET_NAME,
   STELLAR_TESTNET_PASSPHRASE,
+} from "../lib/stellar/network";
+import {
   type FreighterProviderApi,
   type WalletAccount,
   type WalletError,
