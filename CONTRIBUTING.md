@@ -2,6 +2,8 @@
 
 Thanks for helping build open payment infrastructure. Feyo is early-stage, so clear documentation and small, reviewable changes are especially valuable.
 
+For longer-term context, see the [product roadmap](docs/PRODUCT_ROADMAP.md) and [architecture decisions](docs/ARCHITECTURE_DECISIONS.md). Maintainer issue selection and review policies are documented in the [maintainer playbook](docs/MAINTAINER_PLAYBOOK.md). Do not assume an open GitHub issue is enrolled in any funded program.
+
 ## Development
 
 Use Node.js 22.23.3 (the version in `.nvmrc` and CI) or a newer runtime satisfying `package.json`.

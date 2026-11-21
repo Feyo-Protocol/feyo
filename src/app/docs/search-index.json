@@ -189,25 +189,43 @@
     "href": "/docs/roadmap",
     "title": "Roadmap",
     "section": "",
-    "summary": "Feyo is deliberately transparent about what exists today and what still needs engineering."
+    "summary": "Feyo is an independent open-source Stellar payments project. We are building it for long-term ecosystem usefulness, not a single event. The phases below describe our direction,"
   },
   {
-    "href": "/docs/roadmap#implemented",
+    "href": "/docs/roadmap#what-is-in-the-deployed-foundation",
     "title": "Roadmap",
-    "section": "Implemented",
-    "summary": "Next.js application foundation."
+    "section": "What is in the deployed foundation",
+    "summary": "Responsive landing page, MDX developer documentation and search."
   },
   {
-    "href": "/docs/roadmap#work-in-progress",
+    "href": "/docs/roadmap#in-review-independent-read-only-verification",
     "title": "Roadmap",
-    "section": "Work in progress",
-    "summary": "Refining the product model for permission-based payment execution."
+    "section": "In review — independent read-only verification",
+    "summary": "PR #30 adds a read-only Testnet Horizon transaction verifier and aligns runtime and browser test dependencies. This work has passed CI but is not yet merged or deployed as of N"
   },
   {
-    "href": "/docs/roadmap#planned",
+    "href": "/docs/roadmap#next-trustworthy-testnet-payment-preparation",
     "title": "Roadmap",
-    "section": "Planned",
-    "summary": "Broader human-facing payment application flows beyond the local Testnet draft workspace."
+    "section": "Next: trustworthy Testnet payment preparation",
+    "summary": "Better session-only draft management."
+  },
+  {
+    "href": "/docs/roadmap#then-explicitly-authorized-testnet-transactions",
+    "title": "Roadmap",
+    "section": "Then: explicitly authorized Testnet transactions",
+    "summary": "Preview a bounded unsigned classic Stellar payment with amount, asset, issuer, destination, fee, timeout and network shown."
+  },
+  {
+    "href": "/docs/roadmap#longer-term-stablecoins-developers-and-agents",
+    "title": "Roadmap",
+    "section": "Longer-term: stablecoins, developers and agents",
+    "summary": "Supported Stellar stablecoin payment requests, asset/trustline safety, merchant flows and reconciliation."
+  },
+  {
+    "href": "/docs/roadmap#build-with-us",
+    "title": "Roadmap",
+    "section": "Build with us",
+    "summary": "Explore open issues, read our contribution guidelines, and follow the architecture and payment intent documentation. The maintainers review changes through pull requests, with "
   },
   {
     "href": "/docs/stellar",

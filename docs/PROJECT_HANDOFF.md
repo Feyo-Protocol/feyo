@@ -4,6 +4,19 @@
 
 > **IMPORTANT: State is date-scoped.** As of the 2026-11-21 remote check, `main` was `6d69c3f285b09e17f88e9e7f30859e8fe3e6ba3c`. Safe-verification [PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) is **open and pushed, but unreviewed, unmerged and not deployed to production**. Required GitHub CI, docs-search validation and the automatic Vercel preview passed before this status-record update. Check the PR before treating any result as current.
 
+## Permanent project document map
+
+This document is a **date-scoped handoff**, not the entire roadmap. Future agents should consult:
+
+- `AGENTS.md` — required engineering, security and safe-merge rules.
+- `docs/PRODUCT_ROADMAP.md` — multi-phase product strategy, dependencies and exit evidence.
+- `docs/MAINTAINER_PLAYBOOK.md` — maintainer duties and conditional recurring Drips Wave workflow.
+- `docs/ARCHITECTURE_DECISIONS.md` — decisions and why they were made; append new ADRs for major changes.
+- `docs/WAVE_LOG.md` — factual application, eligibility, cycle and appeal notes.
+- `src/app/docs/roadmap/page.mdx` — truthful public product roadmap.
+
+After merging PR #30, update the feature status and exact main SHA; a green preview does not prove production deployment. At each milestone, update this handoff with actual evidence and the precise next action.
+
 ## 1. Why Feyo exists
 
 Feyo is a maintained, independent, non-custodial Stellar payment product for humans, applications and eventually permission-limited AI agents. Its first usable workspace is Testnet-only. It must clearly separate preparing a payment, wallet authorization, network submission, and independently verified settlement. It is not a hackathon demo, Drips-specific project or marketing mockup.

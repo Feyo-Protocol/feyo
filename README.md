@@ -96,6 +96,10 @@ scripts/               Documentation link and search-index checks
 
 Future authorization, signing, submission, and settlement verification are separate design boundaries, described in the [architecture documentation](src/app/docs/architecture/page.mdx).
 
+**Long-term project planning:** [Living engineering roadmap](docs/PRODUCT_ROADMAP.md) · [Architecture decisions](docs/ARCHITECTURE_DECISIONS.md) · [Maintainer playbook](docs/MAINTAINER_PLAYBOOK.md) · [Current project handoff](docs/PROJECT_HANDOFF.md).
+
+Feyo is maintained independently of any external rewards cycle. The product roadmap is flexible and guided by safety, user needs and ecosystem feedback.
+
 ## Documentation and roadmap
 
 These links open the MDX sources on GitHub; run the app to browse the rendered documentation at `/docs`.

@@ -12,6 +12,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 > **Read `docs/PROJECT_HANDOFF.md` at the start and end of every development task.** Update that document whenever scope, implementation, validation, deployment or blockers change. This file states the durable project rules; the handoff records the current, date-stamped state.
 
+## Permanent product roadmap and maintainership
+
+Before planning features or coding, read `docs/PRODUCT_ROADMAP.md` and `docs/ARCHITECTURE_DECISIONS.md` in addition to the date-scoped handoff. Read `docs/MAINTAINER_PLAYBOOK.md` when triaging, assigning issues, planning recurring contributions or working with Drips, and update `docs/WAVE_LOG.md` after any actual application/cycle decision. Feyo's product roadmap exists independently of any rewards program; follow real user needs and security dependencies, not issue quotas. Approval or participation in one Wave is **not** guaranteed for every future Wave.
+
+Update the living roadmap after significant changes, and ensure the public MDX roadmap reflects only genuinely implemented functionality. Onboarding pointers for other coding agents are `CLAUDE.md` and `.github/copilot-instructions.md`; all agents must treat this AGENTS.md as canonical.
+
 ## Product and mission
 
 - Repository: `Feyo-Protocol/feyo`. Website: https://feyo-silk.vercel.app/.
