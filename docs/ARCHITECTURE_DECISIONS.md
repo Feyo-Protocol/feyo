@@ -14,11 +14,11 @@ Keep this as a small **append-only decision log**. Significant changes to produc
 
 **Consequence:** fail closed on account/network changes, and clearly mark all test assets as valueless.
 
-## ADR-003 — Settlement requires independent exact-match evidence (2026-11-21; proposed in PR #30)
+## ADR-003 — Settlement requires independent exact-match evidence (2026-11-21; accepted in PR #30)
 
 **Context:** a draft, client flag, signature or submission response can be misleading. **Decision:** only a verified successful network transaction and complete matching payment operation (hash, source, recipient, exact integer amount, asset type/code/issuer, network and valid ledger) may appear settled. A Horizon 404 is pending/absent, not definite failure. Check stale-request behavior and refuse copied/serialized verifier flags.
 
-**Scope:** PR #30 currently adds a read-only Testnet verifier and status adapter but no live UI, funded transfer, transaction construction, signing or broadcast. Reverify exact merged status before editing this entry.
+**Scope:** PR #30 added the read-only Testnet verifier and status adapter. The later Issue #28 UI milestone consumes that contract but adds no funded transfer, transaction construction, signing or broadcast. Reverify exact branch, merge and deployment status before making product claims.
 
 ## ADR-004 — Persist and reconcile attempts *before* future broadcast (2026-11-21; architecture requirement, not implemented)
 
@@ -29,6 +29,14 @@ Keep this as a small **append-only decision log**. Significant changes to produc
 ## ADR-005 — Evidence-driven open-source changes (2026-11-21; standing policy)
 
 **Decision:** issue scope, docs and roadmap follow verified product needs, tests and ecosystem feedback. External programs may help attract contributors but must not dictate architecture, create artificial work, or pressure unsafe merges. Preserve meaningful commit attribution and protected-branch checks.
+
+## ADR-006 — Browser verification requests are bounded and context-scoped (2026-11-21; proposed)
+
+**Decision:** the read-only `/app` verification interface validates expected hash, source, destination, exact decimal amount, asset code and issuer before Horizon. It calls the existing verifier through a strict 10-second deadline around the complete verification operation. The deadline returns even if an injected client or response body ignores `AbortSignal`, while still aborting the underlying request. User cancellation remains distinct from timeout. Input edits, component unmount, replacement lookups, wallet account changes, disconnects and network/passphrase changes abort and invalidate active responses.
+
+**Consequence:** timeout, cancellation, unavailable and stale states cannot promote a payment to `Verified`; late resolutions and rejections are consumed and ignored. Only same-process opaque evidence from the existing exact-match verifier can render that label. Public hashes and addresses remain privacy-sensitive and are not persisted or logged by the interface.
+
+**Validation:** deterministic unit tests cover preflight, abort-aware and abort-ignoring deadlines, late resolution/rejection and caller cancellation. Playwright exercises the real component lifecycle for input edits, replacement, unmount, wallet account/disconnect/network/passphrase changes, issued assets, cancellation announcements, result focus, all outcome wording and explorer-link boundaries. An opt-in test checks user-supplied genuine public Testnet evidence.
 
 ## Decision entry template
 

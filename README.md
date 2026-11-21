@@ -11,7 +11,7 @@ Integrating payments requires more than moving funds: applications need clear au
 - Connect a wallet on Stellar Testnet, with account and network change handling and recoverable connection errors.
 - Read public XLM and issued-asset balances from Testnet Horizon, preserving asset issuer identity and handling loading, unfunded accounts, empty results, and request failures.
 - Validate payment drafts with exact decimal amounts, recipient addresses, and asset details; create and clear local drafts without signing or submission.
-- Independently verify a known Testnet transaction hash against successful Horizon transaction and exact classic-payment operation evidence through a standalone read-only library.
+- Independently verify a known Testnet transaction hash against the expected source, destination, exact amount, asset and issuer in the read-only workspace.
 - Browse responsive MDX documentation with navigation and search.
 
 Wallet session state and drafts stay in memory and clear on page reload. Disconnect resets the local wallet session; extension permissions remain managed in the wallet.
@@ -22,9 +22,10 @@ Wallet session state and drafts stay in memory and clear on page reload. Disconn
 | --- | --- | --- |
 | Testnet workspace and wallet connection | Implemented | Public address access; unsupported networks rejected |
 | Account balances and payment drafts | Implemented | Read-only balances and local validation; no funds sent |
+| Testnet transaction verification | Pending review | Read-only exact-match lookup UI; no construction, signing, or submission |
 | MDX docs, search, and CI checks | Implemented | Developer documentation and automated validation |
 | Authorization model and execution contracts | In progress | Product and interface design, not an execution service |
-| Stellar transaction lifecycle | In progress | Read-only Testnet verification implemented; construction, signing, and submission remain unimplemented |
+| Stellar transaction lifecycle | In progress | Verifier library merged; user-facing lookup pending review; construction, signing, and submission remain unimplemented |
 | Public payment API and MCP payment tools | Planned | Developer and agent integrations |
 | Nigerian bank payouts | Planned | Requires regulated providers and reviewed integrations |
 
@@ -39,7 +40,7 @@ npm ci
 npm run dev
 ```
 
-Open the [Testnet workspace](http://localhost:3000/app) or [documentation](http://localhost:3000/docs). No environment variables, API keys, or database setup are required for the current workspace. Wallet connection requires the browser extension; balance reads require internet access to Stellar Testnet Horizon.
+Open the [Testnet workspace](http://localhost:3000/app) or [documentation](http://localhost:3000/docs). No environment variables, API keys, or database setup are required for the current workspace. Wallet connection requires the browser extension; balance reads and transaction verification require internet access to Stellar Testnet Horizon.
 
 ### Varial (formerly Freighter) on Testnet
 
@@ -67,7 +68,9 @@ npm run test:browser
 git diff --check
 ```
 
-Tests use Node's built-in runner, including server-rendered React components, plus a locked Playwright browser runner. They cover wallet behavior, balance handling, independent payment verification, payment intent validation, payment status rendering, SEO/robots/sitemap policies, presentation components, documentation, keyboard navigation, mobile navigation, and overflow. No live wallet, network, credentials, or funds are needed; Horizon and wallet behavior use deterministic injected fixtures. Run the browser install once after `npm ci`, then run browser tests after the production build. To serve the production build locally, run `npm start` after `npm run build`.
+The default suite is deterministic and makes no live Horizon calls. An opt-in observation check can verify a genuine public Testnet payment by setting `FEYO_LIVE_TESTNET_VERIFY=1` plus `FEYO_TESTNET_TRANSACTION_HASH`, `FEYO_TESTNET_SOURCE`, `FEYO_TESTNET_DESTINATION`, and `FEYO_TESTNET_AMOUNT`, then running `npm run test:live:testnet`. For an issued asset, also set `FEYO_TESTNET_ASSET_TYPE=issued`, `FEYO_TESTNET_ASSET_CODE`, and `FEYO_TESTNET_ASSET_ISSUER`. These values are public ledger data; never provide a secret key or recovery phrase.
+
+Tests use Node's built-in runner, including server-rendered React components, plus a locked Playwright browser runner. They cover wallet behavior, balance handling, independent payment verification, payment intent validation, payment status rendering, SEO/robots/sitemap policies, presentation components, documentation, keyboard navigation, verification-form accessibility, mobile navigation, cancellation, and overflow. No live wallet, network, credentials, or funds are needed for CI; Horizon and wallet behavior use deterministic injected fixtures. Run the browser install once after `npm ci`, then run browser tests after the production build. To serve the production build locally, run `npm start` after `npm run build`.
 
 ## Public URL, sitemap, and social previews
 

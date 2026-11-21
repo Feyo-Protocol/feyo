@@ -16,15 +16,14 @@ Our priority is straightforward: **correct payments, explicit authorization, ind
 
 The current workspace does **not** sign, broadcast, or settle a payment. It has no Mainnet payments, public payment API, MCP payment execution, or bank payouts.
 
-## In review — independent read-only verification
+## Pending review — user-facing read-only verification
 
-[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) adds a read-only Testnet Horizon transaction verifier and aligns runtime and browser test dependencies. This work has passed CI but is **not yet merged or deployed** as of November 21, 2026. Its library-level verification is not an end-user transaction-hash lookup screen or evidence of a funded Testnet payment.
+The current Issue #28 change implements a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessible outcome states. It must still be reviewed, merged, and separately verified as deployed before it becomes part of the public production foundation. A successful observation does not mean Feyo created, funded, signed, or submitted the transaction.
 
 ## Next: trustworthy Testnet payment preparation
 
 - Better session-only draft management.
 - Recipient readiness and issued-asset trustline checks.
-- A clear read-only transaction-hash lookup with truthful pending, failed, mismatched and verified states.
 - Browser, accessibility and real-wallet regression coverage.
 
 ## Then: explicitly authorized Testnet transactions

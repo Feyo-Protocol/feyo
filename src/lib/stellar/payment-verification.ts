@@ -16,6 +16,8 @@ import {
 const TRANSACTION_HASH_PATTERN = /^[a-fA-F0-9]{64}$/;
 const ASSET_CODE_PATTERN = /^[A-Za-z0-9]{1,12}$/;
 
+export const DEFAULT_VERIFICATION_TIMEOUT_MS = 10_000;
+
 export type TestnetPaymentAsset =
   | { type: "native"; code: "XLM" }
   | { type: "issued"; code: string; issuer: string };
@@ -28,6 +30,109 @@ export interface ExpectedTestnetPayment {
   /** Exact positive amount in stroops; JavaScript numbers are not accepted. */
   amountStroops: bigint;
   asset: TestnetPaymentAsset;
+}
+
+export type VerificationInputField =
+  | "transactionHash"
+  | "source"
+  | "destination"
+  | "amount"
+  | "assetCode"
+  | "issuer";
+
+export interface TestnetPaymentVerificationFormInput {
+  transactionHash: string;
+  source: string;
+  destination: string;
+  amount: string;
+  assetType: "native" | "issued";
+  assetCode: string;
+  issuer: string;
+}
+
+export interface VerificationInputIssue {
+  field: VerificationInputField;
+  message: string;
+}
+
+export type PreparedTestnetPaymentVerification =
+  | { ok: true; expected: ExpectedTestnetPayment }
+  | { ok: false; issues: VerificationInputIssue[] };
+
+/**
+ * Converts user-facing decimal fields into the verifier's exact input type.
+ * This is the shared preflight boundary used before any Horizon request.
+ */
+export function prepareTestnetPaymentVerification(
+  input: TestnetPaymentVerificationFormInput
+): PreparedTestnetPaymentVerification {
+  const transactionHash = input.transactionHash.trim();
+  const source = input.source.trim();
+  const destination = input.destination.trim();
+  const amountInput = input.amount.trim();
+  const assetCode = input.assetCode.trim();
+  const issuer = input.issuer.trim();
+  const issues: VerificationInputIssue[] = [];
+
+  if (!TRANSACTION_HASH_PATTERN.test(transactionHash)) {
+    issues.push({
+      field: "transactionHash",
+      message: "Transaction hash must contain exactly 64 hexadecimal characters.",
+    });
+  }
+  if (!isValidStellarPublicKey(source)) {
+    issues.push({ field: "source", message: "Source must be a valid Stellar G... public key." });
+  }
+  if (!isValidStellarPublicKey(destination)) {
+    issues.push({
+      field: "destination",
+      message: "Destination must be a valid Stellar G... public key.",
+    });
+  }
+
+  const amount = parsePaymentAmount(amountInput);
+  if (!amount.ok) {
+    issues.push({ field: "amount", message: amount.error.message });
+  }
+
+  let asset: TestnetPaymentAsset | undefined;
+  if (input.assetType === "native") {
+    asset = { type: "native", code: "XLM" };
+  } else {
+    if (!ASSET_CODE_PATTERN.test(assetCode)) {
+      issues.push({
+        field: "assetCode",
+        message: "Asset code must contain 1 to 12 letters or numbers.",
+      });
+    }
+    if (!isValidStellarPublicKey(issuer)) {
+      issues.push({ field: "issuer", message: "Issuer must be a valid Stellar G... public key." });
+    }
+    if (ASSET_CODE_PATTERN.test(assetCode) && isValidStellarPublicKey(issuer)) {
+      asset = { type: "issued", code: assetCode, issuer };
+    }
+  }
+
+  if (issues.length > 0 || !amount.ok || asset === undefined) {
+    return { ok: false, issues };
+  }
+
+  const expected: ExpectedTestnetPayment = {
+    network: "testnet",
+    transactionHash: transactionHash.toLowerCase(),
+    source,
+    destination,
+    amountStroops: amount.value.minorUnits,
+    asset,
+  };
+  const verifierIssues = validateExpectedPayment(expected);
+  if (verifierIssues.length > 0) {
+    return {
+      ok: false,
+      issues: verifierIssues.map((message) => ({ field: "transactionHash", message })),
+    };
+  }
+  return { ok: true, expected };
 }
 
 export interface TestnetHorizonVerificationClient {
@@ -401,6 +506,120 @@ export interface VerifyTestnetPaymentOptions {
   client?: TestnetHorizonVerificationClient;
   signal?: AbortSignal;
   now?: () => Date;
+}
+
+export interface VerifyTestnetPaymentWithTimeoutOptions
+  extends VerifyTestnetPaymentOptions {
+  timeoutMs?: number;
+}
+
+/**
+ * Runs the existing verifier with one bounded signal. Callers may also abort
+ * the request when form, wallet, network, or component context changes.
+ */
+export async function verifyTestnetPaymentWithTimeout(
+  expected: ExpectedTestnetPayment,
+  options: VerifyTestnetPaymentWithTimeoutOptions = {}
+): Promise<TestnetPaymentVerificationResult> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_VERIFICATION_TIMEOUT_MS;
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0) {
+    return {
+      status: "invalid_request",
+      network: "testnet",
+      issues: ["Verification timeout must be a positive number of milliseconds."],
+      message: "Payment verification request was invalid and no Horizon lookup was made.",
+    };
+  }
+
+  if (options.signal?.aborted) {
+    return {
+      status: "unavailable",
+      network: "testnet",
+      transactionHash: expected.transactionHash,
+      stage: "transaction",
+      details: options.signal.reason instanceof Error
+        ? options.signal.reason.message
+        : "Verification request was cancelled.",
+      message: "Verification was cancelled before trusted evidence could be applied.",
+    };
+  }
+
+  const controller = new AbortController();
+  type Completion =
+    | { kind: "result"; result: TestnetPaymentVerificationResult }
+    | { kind: "rejected"; error: unknown }
+    | { kind: "timeout" }
+    | { kind: "cancelled"; reason: unknown };
+
+  let finishBoundary: (completion: Completion) => void = () => undefined;
+  const boundary = new Promise<Completion>((resolve) => {
+    finishBoundary = resolve;
+  });
+  const abortFromCaller = () => {
+    const reason = options.signal?.reason;
+    controller.abort(reason);
+    finishBoundary({ kind: "cancelled", reason });
+  };
+  options.signal?.addEventListener("abort", abortFromCaller, { once: true });
+
+  const timer = setTimeout(() => {
+    controller.abort(new DOMException("Verification request timed out.", "TimeoutError"));
+    finishBoundary({ kind: "timeout" });
+  }, timeoutMs);
+
+  // Attach both handlers before racing. If the boundary wins, a late verifier
+  // resolution or rejection is deliberately consumed and cannot affect UI state
+  // or become an unhandled rejection.
+  const verification: Promise<Completion> = verifyTestnetPayment(expected, {
+    client: options.client,
+    now: options.now,
+    signal: controller.signal,
+  }).then(
+    (result) => ({ kind: "result", result }),
+    (error: unknown) => ({ kind: "rejected", error })
+  );
+
+  try {
+    const completion = await Promise.race([verification, boundary]);
+    if (completion.kind === "timeout") {
+      return {
+        status: "unavailable",
+        network: "testnet",
+        transactionHash: expected.transactionHash,
+        stage: "transaction",
+        details: `Request timed out after ${timeoutMs}ms.`,
+        message: "Stellar Testnet Horizon did not respond before the verification timeout.",
+      };
+    }
+    if (completion.kind === "cancelled") {
+      return {
+        status: "unavailable",
+        network: "testnet",
+        transactionHash: expected.transactionHash,
+        stage: "transaction",
+        details: completion.reason instanceof Error
+          ? completion.reason.message
+          : "Verification request was cancelled.",
+        message: "Verification was cancelled before trusted evidence could be applied.",
+      };
+    }
+    if (completion.kind === "rejected") {
+      return {
+        status: "unavailable",
+        network: "testnet",
+        transactionHash: expected.transactionHash,
+        stage: "transaction",
+        details: completion.error instanceof Error
+          ? completion.error.message
+          : String(completion.error),
+        message: "Could not complete the Stellar Testnet Horizon verification.",
+      };
+    }
+    return completion.result;
+  } finally {
+    clearTimeout(timer);
+    options.signal?.removeEventListener("abort", abortFromCaller);
+  }
 }
 
 /**

@@ -15,6 +15,7 @@
     "docs:search:check": "node scripts/generate-docs-search-index.mjs --check",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",
     "test:coverage": "tsc -p tsconfig.test.json && node --experimental-test-coverage --test .test-build/tests/*.test.js",
+    "test:live:testnet": "tsc -p tsconfig.test.json && node --test .test-build/tests/live-testnet-verification.test.js",
     "test:browser": "playwright test --config playwright.config.mjs",
     "test:browser:install": "playwright install chromium"
   },

@@ -50,7 +50,7 @@ Zero, negative, non-finite, exponent-notation, and over-precise values are rejec
 
 Creating a `verified` intent requires opaque evidence returned directly by the Testnet Horizon verifier. The evidence must match the intent network, destination, exact stroop amount, asset code, and issuer. Caller-created booleans and verification-shaped objects are rejected. Draft, signature, and reported submission statuses cannot claim settlement. As defense in depth, `effectiveStatus()` presents a tampered `verified` intent without trusted evidence as `confirming`.
 
-Verifier evidence intentionally loses its trusted runtime provenance when copied or deserialized. A stored payment may preserve public facts for display or audit, but it must be checked against Horizon again before the application presents it as currently verified.
+Verifier evidence intentionally loses its trusted runtime provenance when copied or deserialized. A stored payment may preserve public facts for display or audit, but it must be checked against Horizon again before the application presents it as currently verified. The `/app` verification form performs that fresh read-only check from user-supplied expected payment details; editing any field or changing wallet/network context cancels and invalidates the active lookup.
 
 ## Idempotency requires server enforcement
 

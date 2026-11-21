@@ -47,7 +47,7 @@ Update the living roadmap after significant changes, and ensure the public MDX r
 
 ## Current workflow and technical boundaries
 
-- Current main includes wallet connectivity, Testnet balance reads, local payment drafts, MDX docs, testing and accessibility checks. A **local unmerged** safe-verification milestone is described in `docs/PROJECT_HANDOFF.md`; verify whether it has subsequently become a PR or merged.
+- Current main includes wallet connectivity, Testnet balance reads, local payment drafts, MDX docs, testing/accessibility checks, and the merged read-only verification library from PR #30. The user-facing Issue #28 verification workflow is tracked separately in `docs/PROJECT_HANDOFF.md`; verify its branch/PR/merge/deployment state before making claims.
 - Maintain strict separation of `src/lib/payments/` domain validation, `src/lib/stellar/` network reads/verification, `src/wallet/` provider integration, and `src/components/payment/` display status.
 - Planned work is tracked in GitHub issues #22–#29. Respect dependencies between destination readiness, unsigned preview, signing, controlled submission, independent verification and receipts; a merged verifier does not imply payment execution.
 - Do not change API contracts, network scope, wallet permissions, deployment settings or product claims without tests and clear documentation.
@@ -63,6 +63,7 @@ npm run lint
 npm run docs:check
 npm run docs:search:check
 npm test
+npm run test:live:testnet # Optional; requires explicit public Testnet evidence variables
 npx next typegen
 npx tsc --noEmit
 npm run build

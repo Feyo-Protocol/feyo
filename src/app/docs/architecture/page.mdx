@@ -15,7 +15,7 @@ Feyo is designed as a set of explicit boundaries around a payment intent. A requ
 7. Independently query Horizon for the transaction and its operations.
 8. Present `Verified` only when successful ledger evidence contains the exact expected payment operation.
 
-Only steps 1 and 7-8's standalone read-only verifier exist today. Recipient readiness, unsigned construction, signing, and submission remain separate future milestones.
+Steps 1 and 7-8 exist today, including a read-only `/app` interface for checking a known Testnet hash against expected payment details. Recipient readiness, unsigned construction, signing, and submission remain separate future milestones.
 
 ## System boundaries
 
