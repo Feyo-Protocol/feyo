@@ -18,9 +18,9 @@ Feyo is a maintained, independent, non-custodial Stellar payment product for hum
 | Varial/Freighter public wallet connection and Testnet gating | Yes | Preserved | Wallet transaction authorization |
 | Horizon XLM/issued-asset balance reads | Yes | Network constants centralized | Recipient readiness checks |
 | Exact-decimal local draft validation and honest status component | Yes | Evidence boundaries tightened | Persistent payment intents/history |
-| Independently query Horizon transaction + operations and check exact payment match | No | **Implemented locally; deterministic fixtures pass** | Live hash-verification workflow and deployed integration |
-| Trusted verifier evidence into `PaymentStatus` | No | **Implemented in the presentation contract and component tests** | `/app` has no transaction-hash lookup UI or submitted-payment source |
-| Node runtime and reproducible Playwright version alignment | Old CI based on prior branch | **Updated locally; GitHub CI not run** | — |
+| Independently query Horizon transaction + operations and check exact payment match | No | **Implemented in PR #30; deterministic fixtures and CI pass** | Live hash-verification workflow and production integration |
+| Trusted verifier evidence into `PaymentStatus` | No | **Implemented in PR #30's presentation contract and component tests** | `/app` has no transaction-hash lookup UI or submitted-payment source |
+| Node runtime and reproducible Playwright version alignment | Old CI based on prior branch | **Implemented in PR #30; exact GitHub CI passed** | — |
 | Unsigned classic payment preview | No | No | Issue #26 |
 | Explicit user-reviewed wallet signing | No | No | Issue #27 |
 | Bounded, idempotent Testnet submission | No | No | Separate reviewed milestone, not part of #27 |
