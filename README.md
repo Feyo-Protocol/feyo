@@ -22,10 +22,10 @@ Wallet session state and drafts stay in memory and clear on page reload. Disconn
 | --- | --- | --- |
 | Testnet workspace and wallet connection | Implemented | Public address access; unsupported networks rejected |
 | Account balances and payment drafts | Implemented | Read-only balances and local validation; no funds sent |
-| Testnet transaction verification | Pending review | Read-only exact-match lookup UI; no construction, signing, or submission |
+| Testnet transaction verification | Implemented | Deployed read-only exact-match lookup UI; no construction, signing, or submission |
 | MDX docs, search, and CI checks | Implemented | Developer documentation and automated validation |
 | Authorization model and execution contracts | In progress | Product and interface design, not an execution service |
-| Stellar transaction lifecycle | In progress | Verifier library merged; user-facing lookup pending review; construction, signing, and submission remain unimplemented |
+| Stellar transaction lifecycle | In progress | Read-only verification is deployed; construction, signing, and submission remain unimplemented |
 | Public payment API and MCP payment tools | Planned | Developer and agent integrations |
 | Nigerian bank payouts | Planned | Requires regulated providers and reviewed integrations |
 

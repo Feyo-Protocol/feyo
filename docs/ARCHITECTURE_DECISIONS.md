@@ -30,13 +30,15 @@ Keep this as a small **append-only decision log**. Significant changes to produc
 
 **Decision:** issue scope, docs and roadmap follow verified product needs, tests and ecosystem feedback. External programs may help attract contributors but must not dictate architecture, create artificial work, or pressure unsafe merges. Preserve meaningful commit attribution and protected-branch checks.
 
-## ADR-006 — Browser verification requests are bounded and context-scoped (2026-11-21; proposed)
+## ADR-006 — Browser verification requests are bounded and context-scoped (2026-11-21; accepted in PR #31)
 
 **Decision:** the read-only `/app` verification interface validates expected hash, source, destination, exact decimal amount, asset code and issuer before Horizon. It calls the existing verifier through a strict 10-second deadline around the complete verification operation. The deadline returns even if an injected client or response body ignores `AbortSignal`, while still aborting the underlying request. User cancellation remains distinct from timeout. Input edits, component unmount, replacement lookups, wallet account changes, disconnects and network/passphrase changes abort and invalidate active responses.
 
 **Consequence:** timeout, cancellation, unavailable and stale states cannot promote a payment to `Verified`; late resolutions and rejections are consumed and ignored. Only same-process opaque evidence from the existing exact-match verifier can render that label. Public hashes and addresses remain privacy-sensitive and are not persisted or logged by the interface.
 
 **Validation:** deterministic unit tests cover preflight, abort-aware and abort-ignoring deadlines, late resolution/rejection and caller cancellation. Playwright exercises the real component lifecycle for input edits, replacement, unmount, wallet account/disconnect/network/passphrase changes, issued assets, cancellation announcements, result focus, all outcome wording and explorer-link boundaries. An opt-in test checks user-supplied genuine public Testnet evidence.
+
+**Status evidence:** PR #31 merged the interface at protected-main SHA `4670b5511140b8397bd6858ef06362652c6e91b7`; merged-main CI passed, and production checks on 2026-11-22 confirmed verified, amount-mismatch and preflight-invalid-hash outcomes using unrelated public Testnet evidence. This status change does not add signing, submission, custody or Mainnet support.
 
 ## Decision entry template
 

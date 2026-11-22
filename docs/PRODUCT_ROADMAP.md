@@ -1,7 +1,7 @@
 # Feyo — living product and ecosystem roadmap
 
 **Status:** Directional roadmap, not a fixed-date release commitment.  
-**Last reviewed:** 2026-11-21.  
+**Last reviewed:** 2026-11-22.<br />
 **Maintained by:** Feyo-Protocol maintainers.  
 **Sources of truth:** merged code, GitHub issues/PRs, CI evidence, and verified deployments. Read [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) for the date-scoped status.
 
@@ -28,11 +28,11 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 - Exact-decimal, validated **session-local drafts** and honest status components.
 - Open-source contribution guidelines, protected `main`, automated CI, docs checks and browser navigation tests.
 
-**Not yet on this baseline:** unsigned transactions, signing, broadcasting, verified production payments, durable transaction history, public payment API, agent tools, Mainnet or bank payouts.
+**Not yet on this baseline:** unsigned transaction construction, signing, broadcasting, Feyo-created payments, durable transaction history, public payment API, agent tools, Mainnet or bank payouts.
 
-### Merged milestone: PR #30
+### Delivered read-only verification milestone: PRs #30 and #31
 
-[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) merged Node runtime and Playwright CI alignment ([#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23)) plus read-only Testnet Horizon operation verification with trusted status integration (**partial** [#28](https://github.com/Feyo-Protocol/feyo/issues/28)). The library milestone includes no transaction construction, funded transfer, signing, or broadcast. Production deployment remains a separate evidence state.
+[PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) merged Node runtime and Playwright CI alignment ([#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23)) plus the read-only Testnet Horizon verifier and trusted status integration. [PR #31](https://github.com/Feyo-Protocol/feyo/pull/31) added the user-facing exact-hash verification workflow, completed [#28](https://github.com/Feyo-Protocol/feyo/issues/28), passed merged-main CI, and was deployed to production. A November 22 production check using unrelated public Testnet evidence confirmed the exact match, amount-mismatch, and invalid-hash paths. Feyo did not create, fund, sign, or broadcast that transaction, and this milestone adds no payment execution.
 
 ## Phase 1 — trustworthy read-only Testnet workspace
 
@@ -40,7 +40,7 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 
 - [#24](https://github.com/Feyo-Protocol/feyo/issues/24): multiple **session-only** drafts with clear deletion and no fabricated persistence.
 - [#25](https://github.com/Feyo-Protocol/feyo/issues/25): recipient existence, trustline/issued-asset authorization/limits, memo and muxed-account requirements where appropriate.
-- [#28](https://github.com/Feyo-Protocol/feyo/issues/28): complete and review the exact-hash read-only verification UI, bounded timeout/cancellation, pending vs failure cases, accessible browser coverage, and genuine public Testnet observation. The standalone verifier alone did not close this issue; see the handoff for current branch/PR state.
+- **Delivered — [#28](https://github.com/Feyo-Protocol/feyo/issues/28):** exact-hash read-only verification UI, bounded timeout/cancellation, pending vs failure cases, accessible browser coverage, and genuine public Testnet observation. The issue is closed after PR #31; this does not create a submitted-payment source.
 - Mobile, accessible account/error states and clear explanation of Testnet limitations.
 
 **Exit criteria:** real wallet/browser smoke test, real read-only Horizon observation (using public Testnet data only), deterministic negative tests, no leaked secrets, accessible UX and updated documentation.
@@ -53,7 +53,7 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 2. Bounded unsigned classic XLM transaction preview: account sequence, fee, timeout, full human-readable review and XDR decoding ([#26](https://github.com/Feyo-Protocol/feyo/issues/26)).
 3. Wallet signature only after explicit user approval, network/account revalidation; signing **does not broadcast** ([#27](https://github.com/Feyo-Protocol/feyo/issues/27)).
 4. **New separately reviewed issue:** controlled Testnet submission with persisted attempt identity, idempotency, signed-envelope and transaction hash recorded before broadcast, recovery from ambiguous timeouts, safe identical-envelope retry. No new sequence while earlier payment may land.
-5. Verify transaction **and matching payment operation** from Horizon evidence ([#28](https://github.com/Feyo-Protocol/feyo/issues/28)); show confirming/failed/verified states correctly.
+5. Integrate the delivered exact-match verifier ([#28](https://github.com/Feyo-Protocol/feyo/issues/28)) with any future submitted-payment flow without weakening its independently retrieved Horizon evidence.
 6. Privacy-aware receipts only after verifiable settlement evidence ([#29](https://github.com/Feyo-Protocol/feyo/issues/29)).
 
 **Exit criteria:** at least one genuine funded Testnet transfer with publicly verifiable hash; wrong-network, wrong-asset, reject-signature, stale-balance, timeout, duplication and mismatch tests; review of the security/threat model. **This is not Mainnet readiness.**

@@ -12,13 +12,14 @@ Our priority is straightforward: **correct payments, explicit authorization, ind
 - Varial/Freighter public-wallet connection restricted to Stellar Testnet.
 - Read-only XLM and issued-asset balances, preserving the issuer.
 - Exact-decimal validated local drafts and truthful payment status UI.
+- Deployed read-only Testnet transaction verification against an expected source, destination, exact amount and asset identity.
 - Automated unit, documentation, CI and browser accessibility checks.
 
 The current workspace does **not** sign, broadcast, or settle a payment. It has no Mainnet payments, public payment API, MCP payment execution, or bank payouts.
 
-## Pending review — user-facing read-only verification
+## Deployed — user-facing read-only verification
 
-The current Issue #28 change implements a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessible outcome states. It must still be reviewed, merged, and separately verified as deployed before it becomes part of the public production foundation. A successful observation does not mean Feyo created, funded, signed, or submitted the transaction.
+PR #31 completed Issue #28 and deployed a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessible outcome states. Production checks on November 22, 2026 confirmed the exact-match, amount-mismatch and invalid-hash paths using an unrelated public Testnet transaction. Feyo did not create, fund, sign or submit that transaction, and the workspace still cannot execute payments.
 
 ## Next: trustworthy Testnet payment preparation
 
@@ -50,4 +51,4 @@ We will revise these priorities based on security requirements, ecosystem feedba
 
 Explore [open issues](https://github.com/Feyo-Protocol/feyo/issues), read our [contribution guidelines](/docs/contributing), and follow the [architecture](/docs/architecture) and [payment intent](/docs/payments) documentation. The maintainers review changes through pull requests, with automated tests and clear acceptance criteria.
 
-Detailed engineering planning, dependencies and progress criteria live in the repository's [living product roadmap](https://github.com/Feyo-Protocol/feyo/blob/main/docs/PRODUCT_ROADMAP.md). It will be available on `main` after the documentation update is merged.
+Detailed engineering planning, dependencies and progress criteria live in the repository's [living product roadmap](https://github.com/Feyo-Protocol/feyo/blob/main/docs/PRODUCT_ROADMAP.md).
