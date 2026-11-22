@@ -198,10 +198,10 @@
     "summary": "Responsive landing page, MDX developer documentation and search."
   },
   {
-    "href": "/docs/roadmap#pending-review-user-facing-read-only-verification",
+    "href": "/docs/roadmap#deployed-user-facing-read-only-verification",
     "title": "Roadmap",
-    "section": "Pending review — user-facing read-only verification",
-    "summary": "The current Issue #28 change implements a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessib"
+    "section": "Deployed — user-facing read-only verification",
+    "summary": "PR #31 completed Issue #28 and deployed a read-only transaction-hash interface against exact expected Testnet payment evidence, with bounded requests, cancellation and accessib"
   },
   {
     "href": "/docs/roadmap#next-trustworthy-testnet-payment-preparation",

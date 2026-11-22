@@ -2,13 +2,15 @@
 
 **Purpose:** maintain factual, date-scoped records without changing Feyo's independent product roadmap. Source of truth for actual eligibility is the Drips maintainer dashboard, not this log. Refer to [MAINTAINER_PLAYBOOK.md](MAINTAINER_PLAYBOOK.md) and official rules before acting.
 
-## Current status (2026-11-21)
+## Current status (2026-11-22)
 
 - Stellar Wave maintainer application for `Feyo-Protocol/feyo` was **rejected**; user reported receiving the rejection notice about 2026-11-13 (approximate, not independently confirmed).
-- Rejection email said an appeal may be submitted after **two weeks** and is unlikely without substantial improvements. Establish exact cooldown from Drips' recorded rejection timestamp. As a rough estimate, an email received Nov 13 implies eligibility around Nov 27, but **this date is not confirmed by the dashboard**.
+- Rejection email said an appeal may be submitted after **two weeks** and is unlikely without substantial improvements. The estimated first appeal date is **2026-11-27** if the reported Nov 13 rejection timestamp is correct, but the official Drips dashboard timestamp must establish the actual date.
 - Wave 11 is active Nov 18–25, 2026 per the public Stellar program page. Wave 12 has no verified date in this log.
-- Repo has open ordinary GitHub issues #24–#29. Do not mark as Stellar Wave Program issues until approved, and don't promise funding.
-- Open PR #30 proposes substantial code/CI changes; green CI/preview does not mean merged, released or eligible. Appeal evidence should cite actual merged code and verified product behavior after approval.
+- Repo has future ordinary GitHub issues #24–#27 and #29; Issue #28 is closed as completed. Do not mark future issues as Stellar Wave Program issues until approved, and don't promise funding.
+- [PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) and [PR #31](https://github.com/Feyo-Protocol/feyo/pull/31) are substantive merged improvements since the reported rejection: reproducible runtime/browser CI, an independent Testnet exact-match verifier, trusted status integration, and the accessible user-facing verification workflow. PR #31 closed Issue #28; merged-main GitHub CI passed.
+- The production `/app` verification workflow was manually checked on 2026-11-22 with an unrelated public Testnet transaction. Exact expected details returned `VERIFIED`, an amount changed from `1.87` to `1.88` returned `PAYMENT MISMATCH`, and a short hash returned `INVALID REQUEST` before any Horizon call. This is deployed read-only verification evidence, not a Feyo-created, funded, signed or broadcast payment.
+- These improvements are potential appeal evidence only. They do not establish Drips acceptance, Wave eligibility, funding or permission to use Program labels.
 
 ## Cycle record template (copy for every Wave or review)
 

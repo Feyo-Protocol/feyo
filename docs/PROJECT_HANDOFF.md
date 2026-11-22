@@ -1,8 +1,8 @@
 # Feyo — project continuity and engineering handoff
 
-**Snapshot:** 2026-11-21. **Repository:** https://github.com/Feyo-Protocol/feyo. **Website:** https://feyo-silk.vercel.app/. **Public docs:** https://feyo-silk.vercel.app/docs. **Rules:** `/AGENTS.md`, `/SECURITY.md` and `/CONTRIBUTING.md`.
+**Snapshot:** 2026-11-22. **Repository:** https://github.com/Feyo-Protocol/feyo. **Website:** https://feyo-silk.vercel.app/. **Public app:** https://feyo-silk.vercel.app/app. **Public docs:** https://feyo-silk.vercel.app/docs. **Rules:** `/AGENTS.md`, `/SECURITY.md` and `/CONTRIBUTING.md`.
 
-> **IMPORTANT: State is date-scoped.** As of the 2026-11-21 remote check, protected `main` is `be02fa449078a7cf66ed1cafbc0c105fb8272872`, which merged safe-verification [PR #30](https://github.com/Feyo-Protocol/feyo/pull/30). The user-facing Issue #28 work is currently **local and uncommitted** on `codex/issue-28-verification-ui`, based on that SHA; it is not pushed, reviewed, merged, or deployed. Check GitHub and the worktree before treating this status as current.
+> **IMPORTANT: State is date-scoped.** Protected `main` is `4670b5511140b8397bd6858ef06362652c6e91b7`, the merge commit for [PR #31](https://github.com/Feyo-Protocol/feyo/pull/31). PRs [#30](https://github.com/Feyo-Protocol/feyo/pull/30) and #31 are merged, [Issue #28](https://github.com/Feyo-Protocol/feyo/issues/28) is closed as completed, merged-main GitHub CI passed, and the read-only verification UI is deployed and manually verified in production. The current documentation synchronization branch is `docs/sync-pr31-production-state`, based on that protected-main SHA; check GitHub and the worktree before treating this snapshot as current.
 
 ## Permanent project document map
 
@@ -15,77 +15,78 @@ This document is a **date-scoped handoff**, not the entire roadmap. Future agent
 - `docs/WAVE_LOG.md` — factual application, eligibility, cycle and appeal notes.
 - `src/app/docs/roadmap/page.mdx` — truthful public product roadmap.
 
-At each milestone, update this handoff with actual evidence and the precise next action. A local pass, green PR check, merge, preview, and production deployment are distinct states.
+At each milestone, update this handoff with actual evidence and the precise next action. A local pass, green PR check, merge, preview, production deployment and production observation are distinct states.
 
 ## 1. Why Feyo exists
 
-Feyo is a maintained, independent, non-custodial Stellar payment product for humans, applications and eventually permission-limited AI agents. Its first usable workspace is Testnet-only. It must clearly separate preparing a payment, wallet authorization, network submission, and independently verified settlement. It is not a hackathon demo, Drips-specific project or marketing mockup.
+Feyo is a maintained, independent, non-custodial Stellar payment product for humans, applications and eventually permission-limited AI agents. Its first usable workspace is Testnet-only. It must clearly separate preparing a payment, wallet authorization, network submission and independently verified settlement. It is not a hackathon demo, Drips-specific project or marketing mockup.
 
-**Do not change the product name, replatform the app, add gratuitous features or assert completed payment capabilities without scope agreement.** Build a technically correct, accessible, real product, maintaining the existing midnight-navy/emerald design language.
+**Do not change the product name, replatform the app, add gratuitous features or assert completed payment capabilities without scope agreement.** Build a technically correct, accessible product while maintaining the established design language.
 
 ## 2. Implementation status
 
-| Feature | On merged `main` as last inspected | In local Issue #28 branch | Still not implemented |
-| --- | --- | --- | --- |
-| Marketing site, responsive workspace, MDX docs/search | Yes | Preserved | — |
-| Varial/Freighter public wallet connection and Testnet gating | Yes | Preserved | Wallet transaction authorization |
-| Horizon XLM/issued-asset balance reads | Yes | Network constants centralized | Recipient readiness checks |
-| Exact-decimal local draft validation and honest status component | Yes | Evidence boundaries tightened | Persistent payment intents/history |
-| Independently query Horizon transaction + operations and check exact payment match | Yes, merged via PR #30 | Preserved and consumed | Production deployment evidence |
-| Trusted verifier evidence into `PaymentStatus` | Yes, merged via PR #30 | Preserved; only verifier evidence can label the UI `Verified` | Submitted-payment source |
-| User-facing exact-hash lookup | No | **Implemented locally:** full expected-payment form, preflight, timeout/cancel, outcome/evidence UI | Review, PR CI, merge and deployment |
-| Node runtime and reproducible Playwright version alignment | Yes, merged via PR #30 | Preserved | — |
-| Unsigned classic payment preview | No | No | Issue #26 |
-| Explicit user-reviewed wallet signing | No | No | Issue #27 |
-| Bounded, idempotent Testnet submission | No | No | Separate reviewed milestone, not part of #27 |
-| Receipts backed by verified network evidence | No | No | Issue #29, depends on verification |
-| Mainnet settlement, custody, off-ramp, API/MCP | No | No | Future work, separate security/regulatory design |
+| Feature | Verified status | Still not implemented |
+| --- | --- | --- |
+| Marketing site, responsive workspace, MDX docs/search | Deployed | — |
+| Varial/Freighter public wallet connection and Testnet gating | Deployed, public-address access only | Wallet transaction authorization |
+| Horizon XLM/issued-asset balance reads | Deployed | Recipient readiness checks |
+| Exact-decimal local draft validation and honest status component | Deployed | Persistent payment intents/history |
+| Independently query Horizon transaction + operations and check exact payment match | Merged in PR #30 and deployed | Submitted-payment source |
+| User-facing exact-hash lookup with bounded requests and accessible outcomes | Merged in PR #31, deployed and manually production-verified | Payment construction or execution |
+| Node runtime and reproducible Playwright version alignment | Merged in PR #30; merged-main CI passed | — |
+| Session-only multiple draft history | Not implemented | Issue #24 |
+| Recipient/trustline readiness | Not implemented | Issue #25 |
+| Unsigned classic payment preview | Not implemented | Issue #26 |
+| Explicit user-reviewed wallet signing | Not implemented | Issue #27 |
+| Bounded, idempotent Testnet submission | Not implemented | Separate reviewed milestone, not part of #27 |
+| Receipts backed by verified network evidence | Not implemented | Issue #29 |
+| Mainnet settlement, custody, off-ramp, public API/MCP execution | Not implemented | Future security/regulatory design |
 
-The published app must not claim it can send money while it is still a balance viewer and draft creator.
+The deployed app can inspect balances, create local drafts and independently check a known Testnet transaction. It cannot construct, sign, broadcast or settle a payment.
 
-## 3. Merged safe-verification baseline and local Issue #28 milestone (inspected 2026-11-21)
+## 3. Delivered read-only verification milestone (verified 2026-11-22)
 
-- Merged baseline: PR [#30](https://github.com/Feyo-Protocol/feyo/pull/30), protected-main merge SHA `be02fa449078a7cf66ed1cafbc0c105fb8272872`.
-- Current work: `codex/issue-28-verification-ui`, based on `be02fa4`; local changes only, with no commit, push, PR, review, merge, preview, or deployment.
-- Scope: [#22](https://github.com/Feyo-Protocol/feyo/issues/22), [#23](https://github.com/Feyo-Protocol/feyo/issues/23), [#28](https://github.com/Feyo-Protocol/feyo/issues/28).
-- Runtime: Node >=22.13, `.nvmrc` and both workflows pinned to 22.23.3; Playwright pinned to 1.56.1, browser CI pinned to Ubuntu 24.04.
-- New files: `src/lib/stellar/network.ts`, `src/lib/stellar/payment-verification.ts`, `tests/stellar-payment-verification.test.ts`, `.nvmrc`. Existing CI/config/intent/wallet/status/docs files also updated; inspect `git status` and `git diff --stat` for complete live list.
-- Locally verified on Node 22.23.3 after clean `npm ci`: lint; docs links; docs search; **91/91 unit/component assertions**; Next type generation; TypeScript; production build with **17/17 static pages**; and `git diff --check`.
-- Browser caveat: Playwright 1.56.1 correctly refuses to install Chromium on local Ubuntu 26.04. The direct browser command therefore failed before test logic because revision 1194 was absent. A provisional run against a pre-installed newer Chromium headless shell passed **16/16** keyboard, routing, menu and overflow checks; the pushed GitHub Ubuntu 24.04 job subsequently validated the exact pinned revision and install path.
-- PR #30's GitHub `checks` job passed on Ubuntu 24.04 in 1m25s, including the exact pinned browser install and all 16 browser checks; `docs-search` passed in 48s. The automatic Vercel **preview** also passed. This is CI/preview evidence, not review, merge or production deployment.
-- Dependency audit after the clean install: the high-severity `follow-redirects` advisory was removed with a compatible transitive lockfile bump from 1.16.1 to 1.16.3. `npm audit` still reports nine moderate development/full-tree entries; `npm audit --omit=dev` reports one moderate direct Next.js 16.4.2 entry aggregating current Next advisories, with no compatible fix offered. Do not force the audit-suggested Next/eslint downgrade; review an upgrade separately.
-- PR #30 performed no funded transaction, transaction building, signing, broadcasting or genuine live RPC/Horizon verification. The local Issue #28 milestone has now performed one opt-in read-only Horizon observation of an unrelated public native-XLM Testnet payment; details are recorded below. Feyo did not create, fund, sign or submit it.
+- [PR #30](https://github.com/Feyo-Protocol/feyo/pull/30) merged the read-only Testnet Horizon verifier, exact operation matching, trusted `PaymentStatus` evidence adapter, Node 22.23.3 alignment and reproducible Playwright CI. Its protected-main merge SHA is `be02fa449078a7cf66ed1cafbc0c105fb8272872`.
+- [PR #31](https://github.com/Feyo-Protocol/feyo/pull/31), **“feat(stellar): add safe Testnet payment verification UI,”** merged the user-facing workflow. Its protected-main merge SHA is `4670b5511140b8397bd6858ef06362652c6e91b7`.
+- [Issue #28](https://github.com/Feyo-Protocol/feyo/issues/28) is closed as completed. The implementation is no longer local, pending review or awaiting deployment.
+- GitHub CI on merged `main` passed. The production workflow at https://feyo-silk.vercel.app/app was manually checked successfully on 2026-11-22.
+- Runtime remains Node >=22.13; `.nvmrc` and CI use Node 22.23.3. Playwright remains pinned to 1.56.1 on the supported Ubuntu 24.04 CI runner.
 
-### Local Issue #28 behavior and evidence
+### Deployed behavior and trust boundaries
 
-- `/app` accepts a Testnet transaction hash plus expected source, destination, exact decimal amount, native/issued asset identity and required issuer.
-- Shared preflight in `payment-verification.ts` validates and converts the form to exact stroops before Horizon. The UI calls the existing exact-match verifier; it does not duplicate transaction/operation matching.
-- Each request has a strict 10-second deadline around the complete verification operation plus explicit cancellation. The deadline returns `unavailable` and aborts the underlying request even when an injected client or response body ignores `AbortSignal`; late resolutions/rejections are consumed and ignored. User cancellation is reported separately. Input edits, component unmount, replacement lookups, wallet account changes, disconnects and network/passphrase changes abort and invalidate stale responses.
-- The UI distinguishes `verified`, `failed`, `mismatched`, `not_found`, `malformed`, `invalid_request`, and `unavailable`; only opaque same-process verifier evidence can render `Verified`.
-- Verified/failed/mismatched network evidence shows hash/ledger details and uses the existing validated Stellar Expert Testnet link builder. Inputs are session-only and are not logged or persisted.
-- Deterministic tests cover all-field preflight; abort-aware, abort-ignoring, late-resolve and late-reject deadlines; caller cancellation; keyboard-accessible invalid submission; native and issued-asset trusted evidence; safe Testnet explorer URLs; cancellation/loading announcements; result focus; every outcome; input/replacement/unmount suppression; actual Freighter account, disconnect, Mainnet and incorrect-passphrase lifecycle changes; and `/app` responsive overflow.
-- Opt-in live check passed against official Testnet Horizon for public transaction `ec29030e87bb7707b7a60de39bba8af2252e54c20ae4316a61ee5b4b176ad81c`: source `GCVKD2NSWNYOK6BS3PUMELUW6IRQBYJVW66UFTZWOKLYNBPR4FTQMIHR`, destination `GCVVDPD4M4YOAXEKXJ6YQLPFO43F5MEMSG3J7FOVRBWSMYT7KT7QDHOS`, native XLM, exact amount `1.87`. This is public third-party ledger evidence, not a Feyo payment.
-- Final review validation on the stable diff: lint passed; docs links passed (10 pages/18 internal links); docs search matched; `npm test` passed 97/97 non-skipped tests (98 total, opt-in live test skipped by default); Next type generation and `tsc --noEmit` passed; production build passed with 17/17 static pages; and `git diff --check` passed. The 36-scenario browser/accessibility suite passed provisionally against `/usr/bin/google-chrome` through `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. The unmodified `scripts/check-a11y.sh` could not launch any test because pinned Chromium headless-shell revision 1194 is absent on this unsupported Ubuntu 26.04 host; GitHub Ubuntu 24.04 must supply exact pinned proof. The earlier opt-in official-Horizon live check passed 1/1 for the public transaction above; it was not a Feyo-created or funded payment.
-- Exact browser limitation: `npm run test:browser:install` failed before tests because Playwright 1.56.1 does not support this Ubuntu 26.04 host, and the unmodified pinned-browser/a11y invocation could not find Chromium headless-shell revision 1194. Fresh supported-runner GitHub CI is still required for exact pinned-browser proof. `npm ci` continues to report nine moderate dependency advisories already tracked for separate review.
+- `/app` accepts a Testnet transaction hash plus expected source, destination, exact decimal amount, native/issued asset identity and issuer where required.
+- Shared preflight validates the request and converts the amount to exact stroops before Horizon. Invalid input makes no Horizon request.
+- Each lookup has a strict 10-second deadline and explicit cancellation. Input edits, component unmount, replacement lookups, wallet account changes, disconnects and network/passphrase changes invalidate stale responses.
+- The UI distinguishes `verified`, `failed`, `mismatched`, `not_found`, `malformed`, `invalid_request` and `unavailable`. Only same-process opaque verifier evidence can render `Verified`.
+- Verified, failed and mismatched outcomes display independently retrieved transaction evidence and a validated Stellar Expert Testnet link. Inputs are session-only and are not logged or persisted by the workflow.
+- Verification requires the canonical Testnet Horizon URL and passphrase, successful transaction evidence, a positive ledger, and an exact matching payment operation for source, destination, asset type/code/issuer and integer amount. Incomplete or contradictory evidence fails closed; Horizon 404 means pending/absent, not confirmed failure.
+- The injected client remains a trusted-code test seam, not an untrusted public parameter. Serialized verification-shaped data is not portable evidence and must be freshly verified.
 
-### Verification contracts introduced by this milestone
+### Production verification evidence — 2026-11-22
 
-- Read-only **Testnet-only** Horizon verifier with transaction and operation lookups.
-- Canonical public Testnet Horizon URL and passphrase are both enforced before lookup. The injectable client remains a trusted-code test seam, not an untrusted public API parameter.
-- Exact-source, destination, asset type/code/issuer and integer amount match; successful transaction and positive ledger; contradictory payment source fields and incomplete/malformed result sets fail closed.
-- Outcomes distinguish `verified`, `failed`, `not_found`, `mismatched`, `invalid_request`, `malformed`, `unavailable`. 404 means pending/absent, never confirmed failure.
-- Stale-request invalidation when wallet, hash or intent changes; claimed/fabricated `verified` evidence must fail closed in status display.
-- Opaque process-local evidence is not portable. Any serialized or persisted result requires **fresh verification**; do not put a client-controlled boolean in charge of settlement state.
-- `paymentStatusFromVerifiedEvidence()` is the supported adapter into `PaymentStatus`; the component downgrades a claimed `verified` state without same-process verifier evidence to `confirming`. The `/app` lookup invokes the verifier first and passes only its opaque evidence through that presentation contract.
+The manual production checks used unrelated public Stellar Testnet ledger evidence:
 
-### Review before accepting the milestone
+- **Transaction hash:** `ec29030e87bb7707b7a60de39bba8af2252e54c20ae4316a61ee5b4b176ad81c`
+- **Source:** `GCVKD2NSWNYOK6BS3PUMELUW6IRQBYJVW66UFTZWOKLYNBPR4FTQMIHR`
+- **Destination:** `GCVVDPD4M4YOAXEKXJ6YQLPFO43F5MEMSG3J7FOVRBWSMYT7KT7QDHOS`
+- **Asset/amount:** native XLM, exactly `1.87`
 
-- Review the full read-only verifier diff, including exact operation-count completeness, asset identity, source consistency and exact amount matching. Horizon's documented page maximum is 200; a response shorter than the transaction's `operation_count` is rejected rather than partially trusted.
-- Confirm the same-process evidence model is appropriate for the first consumer. It prevents copied/serialized flags from rendering `Verified`, but it is not a cryptographic attestation and the injected client must remain trusted code.
-- Review the strict complete-operation 10-second deadline, distinct explicit cancellation, late-promise consumption, and `/app` controller/context behavior. Backoff is intentionally absent because verification is user-triggered and automatic retries could obscure uncertainty.
-- Check the Node engine requirement against actual SDK package metadata and Vercel runtime support.
-- Preserve the passing GitHub CI path, especially the pinned browser install on Ubuntu 24.04; rerun it after any implementation change.
-- Keep deployment deferred until the Issue #28 branch is reviewed and merged; the local UI is read-only and is not yet a production user-facing transaction service.
+Observed production results:
+
+1. Exact expected details returned **VERIFIED** and displayed transaction evidence, ledger, operation, source, destination, `1.87 XLM` and a Stellar Expert Testnet link.
+2. Changing the amount to `1.88` returned **PAYMENT MISMATCH** and identified the amount mismatch.
+3. Entering an invalid/short transaction hash returned **INVALID REQUEST**, stated that the hash must contain exactly 64 hexadecimal characters, and made no Horizon request.
+
+This transaction was public third-party Testnet evidence. Feyo did **not** create, fund, sign or broadcast it. These checks prove deployed read-only matching behavior, not payment execution, ownership of the transaction, off-chain delivery, fiat payout or Mainnet settlement.
+
+### Validation provenance
+
+- Before merge, the Issue #28 implementation passed lint, documentation link/search checks, 97/97 non-skipped unit/component tests (98 total; opt-in live test skipped by default), Next type generation, TypeScript and a 17/17-page production build. The 36-scenario browser/accessibility suite passed provisionally with the local system Chrome; the unsupported local Ubuntu 26.04 host could not install the pinned Playwright Chromium revision.
+- The earlier opt-in live Horizon check passed against the same unrelated public Testnet transaction. It made no funded Feyo transfer.
+- The supported GitHub Ubuntu 24.04 runner supplied the authoritative pinned-browser evidence; GitHub CI on merged `main` passed.
+- Production browser behavior was then manually verified with the three cases recorded above.
+- This documentation synchronization was validated on `docs/sync-pr31-production-state` with Node 22.23.3: lint passed; docs links passed for 10 pages and 18 internal links; the regenerated docs search index matched; `npm test` passed 97 tests with one opt-in live test skipped; Next route type generation passed; `tsc --noEmit` passed; and the production build generated 17/17 static pages. No new live Horizon call, wallet action or funded transaction was needed for this documentation-only task.
+- `npm audit` previously reported nine moderate full-tree/development entries and one moderate production Next.js advisory with no compatible fix offered at that time. Review dependency upgrades separately; do not fold them into this documentation synchronization.
 
 ## 4. Payment architecture and safety constraints
 
@@ -94,48 +95,47 @@ Target flow (not all implemented):
 `validated intent → recipient/trustline readiness → fresh sequence/fee/time bound → unsigned XDR review → user-controlled wallet approval → signed envelope → persisted attempt/hash → controlled Testnet submission → exact-hash network lookup → matching payment operation → evidence-backed status/receipt`.
 
 - Never request or hold secret seeds/recovery phrases. Enforce the explicit Testnet passphrase.
-- Use precise decimal strings/stroops and preserve issuer, source, destination, and memo/muxed-account semantics where appropriate.
-- Signature != submission != verified settlement. Transaction hash alone is not enough if the operation does not exactly match the intended payment.
-- Persist intent fingerprint, unique attempt, signed envelope identity, sequence, and hash **before** any future broadcast; query the original hash before retries and avoid sequence changes after ambiguous outcomes.
-- Public addresses/hashes can be linkable personal data. No sensitive logging or fabricated receipts. Never turn on production/Mainnet money movement under a read-only issue.
+- Use precise decimal strings/stroops and preserve issuer, source, destination and memo/muxed-account semantics where appropriate.
+- Signature != submission != verified settlement. A transaction hash alone is not enough when the operation does not exactly match the intended payment.
+- Persist intent fingerprint, unique attempt, signed-envelope identity, sequence and hash **before** any future broadcast; query the original hash before retries and avoid sequence changes after ambiguous outcomes.
+- Public addresses and hashes are linkable privacy data. Do not add sensitive logging or fabricate receipts. Never enable production/Mainnet money movement under a read-only issue.
 
 ## 5. Issue backlog and dependencies
 
-1. [#22](https://github.com/Feyo-Protocol/feyo/issues/22): Node runtime. **Merged in PR #30.**
-2. [#23](https://github.com/Feyo-Protocol/feyo/issues/23): Deterministic browser CI. **Merged in PR #30.**
-3. [#28](https://github.com/Feyo-Protocol/feyo/issues/28): Read-only payment verification. **Library/status contract merged in PR #30; the user-facing bounded lookup, browser coverage and public live observation are implemented and locally verified on `codex/issue-28-verification-ui`, pending maintainer review, PR CI, merge and deployment.**
-4. [#25](https://github.com/Feyo-Protocol/feyo/issues/25): Read-only recipient/trustline readiness, including destination existence, authorization, limits and account requirements.
-5. [#26](https://github.com/Feyo-Protocol/feyo/issues/26): Bounded unsigned classic XLM Testnet payment preview. Requires safe sequence/fee/timeout handling and human-visible XDR decoding.
-6. [#27](https://github.com/Feyo-Protocol/feyo/issues/27): Explicit wallet signing authorization for reviewed Testnet envelope, **no submission**; depends on #26.
-7. **Separate issue needed:** Controlled Testnet submission with durable attempt storage, idempotency and ambiguous-outcome recovery. Do not quietly add broadcasting in #27 or #28.
-8. [#24](https://github.com/Feyo-Protocol/feyo/issues/24): Session-only draft history; avoid confusing drafts with history of paid transactions.
+1. [#22](https://github.com/Feyo-Protocol/feyo/issues/22): Node runtime. **Completed in PR #30.**
+2. [#23](https://github.com/Feyo-Protocol/feyo/issues/23): Deterministic browser CI. **Completed in PR #30.**
+3. [#28](https://github.com/Feyo-Protocol/feyo/issues/28): Read-only payment verification. **Completed across PRs #30 and #31; deployed and production-verified.**
+4. [#24](https://github.com/Feyo-Protocol/feyo/issues/24): Session-only draft history; avoid confusing drafts with paid-transaction history.
+5. [#25](https://github.com/Feyo-Protocol/feyo/issues/25): Read-only recipient/trustline readiness, including destination existence, authorization, limits and account requirements.
+6. [#26](https://github.com/Feyo-Protocol/feyo/issues/26): Bounded unsigned classic XLM Testnet payment preview with safe sequence/fee/timeout handling and human-visible XDR decoding.
+7. [#27](https://github.com/Feyo-Protocol/feyo/issues/27): Explicit wallet signing authorization for a reviewed Testnet envelope, **without submission**; depends on #26.
+8. **Separate issue needed before execution:** controlled Testnet submission with durable attempt storage, idempotency and ambiguous-outcome recovery. Do not quietly add broadcasting in #27 or #28.
 9. [#29](https://github.com/Feyo-Protocol/feyo/issues/29): Privacy-aware receipts, only after trusted verification and tests; no offline proof of a real on-chain payment.
 
-Avoid duplicating completed work when using issues #22/#23/#28 after the local PR is merged.
+Do not duplicate #28 or treat the deployed verifier as proof that construction, signing, submission or receipts exist.
 
 ## 6. Collaboration and quality gates
 
 - Protected `main` is maintained through small, reviewed PRs. Preserve contributors' fork branches and authorship. Issue assignment and contribution workflows are in `CONTRIBUTING.md`.
 - CI requires Node installation, lint, docs links/search, unit tests, typecheck, Next build and pinned-browser navigation/accessibility checks. Run commands from `AGENTS.md`.
-- Record test provenance precisely: **fixture**, **manual real wallet**, **live Horizon**, **funded Testnet transfer**, or **deployed production**. Do not interchange them.
+- Record test provenance precisely: **fixture**, **manual real wallet**, **live Horizon**, **funded Testnet transfer** or **deployed production**. Do not interchange them.
 - No force pushes, destructive resets, fabricated review evidence or undocumented new dependencies. Scope breaking changes and security risk separately.
 
 ## 7. Drips Stellar Wave context — not a product requirement
 
-- Feyo applied to the Stellar Wave maintainer program; repository was rejected. The email was reported received around **2026-11-13**, but use the exact rejection timestamp from Drips to establish the first appeal date.
-- Official rules: first appeal after 14 days (approximately **2026-11-27** if rejected Nov 13), one-month cooldown following a rejected appeal, maximum three appeals. Submit only through the program's in-app appeal form.
-- Wave 11 runs Nov 18–25, 2026. Wave 12 date is not confirmed in this handoff.
-- A substantive appeal requires **merged, reviewed, verified implementation** and specific before/after code evidence. New issues alone are insufficient; no invented real-world payment evidence or claims of acceptance.
+- Feyo's Stellar Wave maintainer application was rejected. The notice was reportedly received around **2026-11-13**, but the exact Drips dashboard timestamp remains the source of truth.
+- The estimated first appeal date is **2026-11-27** if the reported timestamp is correct. Confirm the official 14-day cooldown in the dashboard before submitting; this estimate does not establish eligibility.
+- PRs #30 and #31 are substantive merged improvements since the reported rejection, and the production evidence above can support an appeal. They do not guarantee acceptance, Wave eligibility, rewards or permission to apply Program labels.
+- Submit only through the official in-app appeal form when eligible. Do not invent usage, funded-payment evidence or ecosystem claims.
 - Appeal link (use only when eligible): https://www.drips.network/wave/appeal/fdc01c95-806f-4b6a-998b-a6ed37e0d81b/20fd93c3-c249-425a-8a33-91b362848708
-- Do not mention Drips/reward motivation in user-facing product marketing. Do not promise payment or Wave reward eligibility for regular GitHub issues.
+- Keep Drips/reward motivation out of public product marketing. Feyo's roadmap remains independent of the program.
 
 ## 8. Exact next actions for the next agent
 
-1. Review the completed local diff and final verification report for `codex/issue-28-verification-ui`; exact Playwright 1.56.1 Chromium proof must come from the supported GitHub Ubuntu 24.04 runner.
-2. If approved, commit and push the focused branch, open the Issue #28 PR, and require fresh GitHub checks and review. Do not merge or deploy without explicit maintainer approval.
-3. After merge/deployment, repeat a safe public live observation in the deployed browser and update this file with exact PR, merge SHA and deployment evidence.
-4. Review the unresolved moderate dependency audit and Vercel Node runtime support separately; do not fold a Next.js upgrade into Issue #28.
-5. Then address #25 or #26 in separate focused PRs while preserving Testnet-only and no-submission boundaries.
+1. **Prepare the Drips appeal evidence package** from merged PRs #30/#31, merged-main CI and the 2026-11-22 production observations. Confirm the exact rejection/dashboard timestamp and official earliest appeal date before submission. This is the next action; do not start another product feature first.
+2. Keep the evidence precise: distinguish deterministic fixtures, supported-runner CI, live Horizon observation and deployed manual production behavior. State explicitly that the public transaction was unrelated and not created, funded, signed or broadcast by Feyo.
+3. Review and submit the appeal only through the official flow when eligible; record the actual submission and decision in `docs/WAVE_LOG.md`. Do not claim acceptance or eligibility in advance.
+4. Review the unresolved dependency advisories separately. After the appeal evidence work, select #24 or #25/#26 according to roadmap dependencies in a new focused issue/PR; do not add signing or broadcasting implicitly.
 
 ### Template for updating this handoff after any PR
 
@@ -143,6 +143,7 @@ Avoid duplicating completed work when using issues #22/#23/#28 after the local P
 
 ### Milestone history
 
-- `2026-11-21 — PR #30 — codex/issues-22-23-28-safe-verification@b073ce5 (+ continuity updates) — open/pushed, required CI and automatic preview passed, not reviewed/merged/production-deployed — Node/Playwright alignment, read-only Testnet verifier and trusted PaymentStatus contract — deterministic Horizon fixtures plus exact GitHub browser CI; no live/funded payment evidence — moderate dependency advisories and live-workflow limitations recorded above — next: maintainer review.`
-- `2026-11-21 — PR #30 merged at be02fa4 — protected main — read-only Testnet verifier, trusted status contract and Node/Playwright alignment merged; production deployment not reverified in this session.`
-- `2026-11-21 — codex/issue-28-verification-ui (local/uncommitted) — user-facing strictly bounded read-only verifier, deterministic deadline/negative tests, real component wallet/network lifecycle tests, browser accessibility coverage and one opt-in genuine public Testnet observation; exact pinned Chromium remains blocked by unsupported local Ubuntu 26.04 and requires GitHub Ubuntu 24.04 CI; no Feyo-created transaction, signing or broadcast — next: review this final report before commit/push/PR.`
+- `2026-11-21 — PR #30 merged at be02fa4 — protected main — Node/Playwright alignment, read-only Testnet verifier and trusted status contract merged; no construction, signing, broadcast or Feyo-funded live transaction.`
+- `2026-11-21 — PR #31 merged at 4670b55 — protected main — user-facing bounded Testnet verification UI merged, Issue #28 closed and merged-main GitHub CI passed; no payment execution.`
+- `2026-11-22 — production /app — exact third-party public Testnet evidence verified; 1.88 mismatch and invalid short-hash preflight also behaved correctly; no Feyo-created/funded/signed/broadcast transaction — next: synchronize documentation and prepare appeal evidence.`
+- `2026-11-22 — docs/sync-pr31-production-state based on 4670b55 — local documentation-only synchronization; roadmap, README, architecture status, Wave log, handoff and generated docs search index updated; required local checks passed on Node 22.23.3 — no feature, signing, broadcast, custody or Mainnet change — next: review/open the focused docs PR, then prepare Drips appeal evidence.`
