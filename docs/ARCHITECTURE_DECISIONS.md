@@ -51,3 +51,14 @@ Keep this as a small **append-only decision log**. Significant changes to produc
 - **Validation and evidence:**
 - **Issue/PR links and date:**
 - **Supersedes:** (if applicable)
+
+
+## ADR-007 — Read-only recipient readiness is observational, not a guarantee (2026-11-27; proposed in Issue #25 branch)
+
+**Context:** payment preparation should identify obvious Testnet destination/account and issued-asset trustline conditions without pretending that a preflight guarantees later execution.
+
+**Decision:** use only the canonical Testnet Horizon account endpoint. Validate the destination public key before requesting data. For issued assets, match both code and issuer; expose Horizon authorization flags and reported balance/limit only when present. A same-code/different-issuer trustline is never accepted. Missing visible trustlines must be described carefully because issuer authorization policy can affect what Horizon exposes. Bound the complete request and response-body read, abort on timeout/cancellation, and invalidate stale results after destination or wallet/network context changes.
+
+**Consequences:** readiness is a point-in-time observation, not a reservation or promise of payment acceptance. This feature does not create accounts/trustlines, calculate guaranteed receiving capacity, sign or submit transactions, or add Mainnet support.
+
+**Validation expected before acceptance:** deterministic funded/unfunded, exact issuer, missing trustline, authorization, limit, malformed response, Horizon failure, timeout and cancellation tests; browser tests for invalid input, stale destination changes and accessible result states. Mark this ADR accepted only after the Issue #25 PR is reviewed and merged.

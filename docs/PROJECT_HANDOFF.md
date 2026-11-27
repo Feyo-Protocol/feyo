@@ -1,8 +1,8 @@
 # Feyo — project continuity and engineering handoff
 
-**Snapshot:** 2026-11-22. **Repository:** https://github.com/Feyo-Protocol/feyo. **Website:** https://feyo-silk.vercel.app/. **Public app:** https://feyo-silk.vercel.app/app. **Public docs:** https://feyo-silk.vercel.app/docs. **Rules:** `/AGENTS.md`, `/SECURITY.md` and `/CONTRIBUTING.md`.
+**Snapshot:** 2026-11-27. **Repository:** https://github.com/Feyo-Protocol/feyo. **Website:** https://feyo-silk.vercel.app/. **Public app:** https://feyo-silk.vercel.app/app. **Public docs:** https://feyo-silk.vercel.app/docs. **Rules:** `/AGENTS.md`, `/SECURITY.md` and `/CONTRIBUTING.md`.
 
-> **IMPORTANT: State is date-scoped.** Protected `main` is `4670b5511140b8397bd6858ef06362652c6e91b7`, the merge commit for [PR #31](https://github.com/Feyo-Protocol/feyo/pull/31). PRs [#30](https://github.com/Feyo-Protocol/feyo/pull/30) and #31 are merged, [Issue #28](https://github.com/Feyo-Protocol/feyo/issues/28) is closed as completed, merged-main GitHub CI passed, and the read-only verification UI is deployed and manually verified in production. The current documentation synchronization branch is `docs/sync-pr31-production-state`, based on that protected-main SHA; check GitHub and the worktree before treating this snapshot as current.
+> **IMPORTANT: State is date-scoped.** Protected `main` is `222063731754bb8a1ca02fa5a22cc4f8676d7f85`. PRs [#30](https://github.com/Feyo-Protocol/feyo/pull/30), [#31](https://github.com/Feyo-Protocol/feyo/pull/31) and [#32](https://github.com/Feyo-Protocol/feyo/pull/32) are merged; [Issue #28](https://github.com/Feyo-Protocol/feyo/issues/28) is closed; merged-main CI passed. The local Issue #25 implementation is being prepared on `feat/issue-25-recipient-readiness`, based on this `main` SHA; it has not yet been validated by repository CI, pushed, reviewed, merged or deployed. Confirm GitHub and the worktree before treating this snapshot as current.
 
 ## Permanent project document map
 
@@ -29,7 +29,8 @@ Feyo is a maintained, independent, non-custodial Stellar payment product for hum
 | --- | --- | --- |
 | Marketing site, responsive workspace, MDX docs/search | Deployed | — |
 | Varial/Freighter public wallet connection and Testnet gating | Deployed, public-address access only | Wallet transaction authorization |
-| Horizon XLM/issued-asset balance reads | Deployed | Recipient readiness checks |
+| Horizon XLM/issued-asset balance reads | Deployed | — |
+| Recipient account and issued-asset readiness | Local implementation on `feat/issue-25-recipient-readiness`; not yet pushed or reviewed | CI, merge and deployment pending |
 | Exact-decimal local draft validation and honest status component | Deployed | Persistent payment intents/history |
 | Independently query Horizon transaction + operations and check exact payment match | Merged in PR #30 and deployed | Submitted-payment source |
 | User-facing exact-hash lookup with bounded requests and accessible outcomes | Merged in PR #31, deployed and manually production-verified | Payment construction or execution |
@@ -88,6 +89,17 @@ This transaction was public third-party Testnet evidence. Feyo did **not** creat
 - This documentation synchronization was validated on `docs/sync-pr31-production-state` with Node 22.23.3: lint passed; docs links passed for 10 pages and 18 internal links; the regenerated docs search index matched; `npm test` passed 97 tests with one opt-in live test skipped; Next route type generation passed; `tsc --noEmit` passed; and the production build generated 17/17 static pages. No new live Horizon call, wallet action or funded transaction was needed for this documentation-only task.
 - `npm audit` previously reported nine moderate full-tree/development entries and one moderate production Next.js advisory with no compatible fix offered at that time. Review dependency upgrades separately; do not fold them into this documentation synchronization.
 
+### Current Issue #25 implementation — local branch, not yet reviewed
+
+- Branch: `feat/issue-25-recipient-readiness`; base: protected `main` `222063731754bb8a1ca02fa5a22cc4f8676d7f85`.
+- Adds `src/lib/stellar/recipient-readiness.ts` and `src/components/payment/RecipientReadiness.tsx`; inserts a non-blocking preflight into the existing `/app` draft form.
+- Uses the canonical Testnet Horizon `/accounts/{address}` endpoint. Invalid public addresses and invalid asset identities are rejected before any request. Issued-asset trustlines match exact code **and** issuer.
+- Reports funded/unfunded destinations, visible matching/missing trustlines, authorization flags, reported balance/limit, Horizon errors, malformed/unknown and cancellation outcomes. A same-code/different-issuer trustline is never a match.
+- Includes a strict 10-second deadline for the full fetch and response-body read; timeout/cancellation aborts the request and stale destination changes or wallet/network context changes suppress old UI results.
+- Readiness is observational only. It does not establish that a future payment will succeed, and it does not create/fund accounts or trustlines, construct/sign/broadcast transactions, or enable Mainnet.
+- Test additions cover native and issued assets, exact issuer matching, authorization/limit states, malformed responses, Horizon failures, timeout despite ignored abort, caller cancellation, invalid-address no-request behavior and browser stale-destination handling.
+- **Validation status:** prepared patch only at this snapshot. The new tests have not yet been run in the user's checkout. Run the full repository checklist and supported-browser suite before pushing. Do not call Issue #25 complete until CI/review/merge/deployment evidence exists.
+
 ## 4. Payment architecture and safety constraints
 
 Target flow (not all implemented):
@@ -106,7 +118,7 @@ Target flow (not all implemented):
 2. [#23](https://github.com/Feyo-Protocol/feyo/issues/23): Deterministic browser CI. **Completed in PR #30.**
 3. [#28](https://github.com/Feyo-Protocol/feyo/issues/28): Read-only payment verification. **Completed across PRs #30 and #31; deployed and production-verified.**
 4. [#24](https://github.com/Feyo-Protocol/feyo/issues/24): Session-only draft history; avoid confusing drafts with paid-transaction history.
-5. [#25](https://github.com/Feyo-Protocol/feyo/issues/25): Read-only recipient/trustline readiness, including destination existence, authorization, limits and account requirements.
+5. [#25](https://github.com/Feyo-Protocol/feyo/issues/25): read-only recipient/trustline readiness; implementation is on local branch `feat/issue-25-recipient-readiness` and still needs full local validation, push, PR CI, review, merge and deployment.
 6. [#26](https://github.com/Feyo-Protocol/feyo/issues/26): Bounded unsigned classic XLM Testnet payment preview with safe sequence/fee/timeout handling and human-visible XDR decoding.
 7. [#27](https://github.com/Feyo-Protocol/feyo/issues/27): Explicit wallet signing authorization for a reviewed Testnet envelope, **without submission**; depends on #26.
 8. **Separate issue needed before execution:** controlled Testnet submission with durable attempt storage, idempotency and ambiguous-outcome recovery. Do not quietly add broadcasting in #27 or #28.
@@ -132,10 +144,11 @@ Do not duplicate #28 or treat the deployed verifier as proof that construction, 
 
 ## 8. Exact next actions for the next agent
 
-1. **Prepare the Drips appeal evidence package** from merged PRs #30/#31, merged-main CI and the 2026-11-22 production observations. Confirm the exact rejection/dashboard timestamp and official earliest appeal date before submission. This is the next action; do not start another product feature first.
-2. Keep the evidence precise: distinguish deterministic fixtures, supported-runner CI, live Horizon observation and deployed manual production behavior. State explicitly that the public transaction was unrelated and not created, funded, signed or broadcast by Feyo.
-3. Review and submit the appeal only through the official flow when eligible; record the actual submission and decision in `docs/WAVE_LOG.md`. Do not claim acceptance or eligibility in advance.
-4. Review the unresolved dependency advisories separately. After the appeal evidence work, select #24 or #25/#26 according to roadmap dependencies in a new focused issue/PR; do not add signing or broadcasting implicitly.
+1. Complete local validation for the Issue #25 implementation on `feat/issue-25-recipient-readiness`; distinguish isolated patch checks from the full repository test suite.
+2. Review the full diff and security boundaries, then push the branch and open a focused PR closing #25 only if the supported local/CI checks pass.
+3. Require GitHub Ubuntu 24.04 browser CI and maintainer review before merging. Do not merge, deploy or close #25 based only on local tests.
+4. After merge, deploy and manually confirm native-XLM funded/unfunded and issued-asset exact-code/issuer readiness states using public Testnet data. Update README status, public MDX roadmap, handoff, and release evidence to reflect the actual merge/deployment state.
+5. Keep the Drips appeal process separate. Confirm the dashboard eligibility date and form state; do not claim approval or Wave eligibility before Drips decides.
 
 ### Template for updating this handoff after any PR
 
@@ -147,3 +160,4 @@ Do not duplicate #28 or treat the deployed verifier as proof that construction, 
 - `2026-11-21 — PR #31 merged at 4670b55 — protected main — user-facing bounded Testnet verification UI merged, Issue #28 closed and merged-main GitHub CI passed; no payment execution.`
 - `2026-11-22 — production /app — exact third-party public Testnet evidence verified; 1.88 mismatch and invalid short-hash preflight also behaved correctly; no Feyo-created/funded/signed/broadcast transaction — next: synchronize documentation and prepare appeal evidence.`
 - `2026-11-22 — docs/sync-pr31-production-state based on 4670b55 — local documentation-only synchronization; roadmap, README, architecture status, Wave log, handoff and generated docs search index updated; required local checks passed on Node 22.23.3 — no feature, signing, broadcast, custody or Mainnet change — next: review/open the focused docs PR, then prepare Drips appeal evidence.`
+- `2026-11-27 — Issue #25 local implementation — branch `feat/issue-25-recipient-readiness` based on `2220637` — read-only Testnet recipient account and exact issued-asset trustline preflight added with authorization/limit observations and strict timeout/stale-request guards — tests and CI pending local execution; no push, PR, merge or deployment yet — next: run the full checklist, fix any failures, then open a focused PR.`

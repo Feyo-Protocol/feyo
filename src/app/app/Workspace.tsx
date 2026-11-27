@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WalletConnection } from "@/components/wallet/WalletConnection";
 import { PaymentStatus } from "@/components/payment/PaymentStatus";
 import { PaymentVerification } from "@/components/payment/PaymentVerification";
+import { RecipientReadiness } from "@/components/payment/RecipientReadiness";
 import type { PaymentStatusData } from "@/components/payment/status-model";
 import { createPaymentIntent, createPaymentIntentId, type PaymentAsset, type PaymentValidationIssue } from "@/lib/payments/intent";
 import { fetchTestnetAccountBalances, LatestBalanceRequest, type StellarAssetBalance, type StellarBalanceError } from "@/lib/stellar/account-balances";
@@ -141,6 +142,12 @@ export default function Workspace() {
             <label htmlFor="recipient">Recipient public address</label><input id="recipient" name="recipient" autoComplete="off" spellCheck={false} placeholder="G…" value={recipient} aria-invalid={!!fieldError("destination")} aria-describedby={fieldError("destination") ? "recipient-error" : "recipient-help"} onChange={(e) => setRecipient(e.target.value)} />{fieldError("destination") ? <span className="field-error" id="recipient-error">{fieldError("destination")}</span> : <span className="field-help" id="recipient-help">Stellar public key beginning with G</span>}
             <div className="form-row"><div><label htmlFor="asset">Asset</label><select id="asset" value={assetKey} onChange={(e) => setAssetKey(e.target.value)}>{assets.map((asset) => { const key = asset.type === "native" ? "native:XLM" : `issued:${asset.code}:${asset.issuer}`; return <option key={key} value={key}>{asset.type === "native" ? "XLM · Native" : `${asset.code} · ${shortAddress(asset.issuer)}`}</option>; })}</select>{currentAsset.type === "issued" && <span className="field-help issuer-full">Issuer: <code>{currentAsset.issuer}</code></span>}</div><div><label htmlFor="amount">Exact amount</label><div className="amount-input"><input id="amount" name="amount" inputMode="decimal" placeholder="0.00" value={amount} aria-invalid={!!fieldError("amount")} aria-describedby={fieldError("amount") ? "amount-error" : "amount-help"} onChange={(e) => setAmount(e.target.value)} /><span>{currentAsset.code}</span></div>{fieldError("amount") ? <span className="field-error" id="amount-error">{fieldError("amount")}</span> : <span className="field-help" id="amount-help">Up to 7 decimal places</span>}</div></div>
             {fieldError("asset") && <p className="field-error" role="alert">{fieldError("asset")}</p>}
+            <RecipientReadiness
+              key={`${verificationContextKey}|${recipient}|${assetKey}`}
+              destination={recipient}
+              asset={currentAsset}
+              contextKey={verificationContextKey}
+            />
             <div className="testnet-lock"><span>◎</span><div><strong>Stellar Testnet</strong><small>Network is fixed for this workspace.</small></div><span className="lock-label">LOCKED</span></div>
             <button className="create-draft-button" type="submit">Create local draft <span>→</span></button>
           </form>

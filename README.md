@@ -12,6 +12,7 @@ Integrating payments requires more than moving funds: applications need clear au
 - Read public XLM and issued-asset balances from Testnet Horizon, preserving asset issuer identity and handling loading, unfunded accounts, empty results, and request failures.
 - Validate payment drafts with exact decimal amounts, recipient addresses, and asset details; create and clear local drafts without signing or submission.
 - Independently verify a known Testnet transaction hash against the expected source, destination, exact amount, asset and issuer in the read-only workspace.
+- Inspect a destination account and exact issued-asset trustline through a non-blocking, read-only Testnet preflight; authorization and limit data are observations, not payment guarantees.
 - Browse responsive MDX documentation with navigation and search.
 
 Wallet session state and drafts stay in memory and clear on page reload. Disconnect resets the local wallet session; extension permissions remain managed in the wallet.
@@ -22,6 +23,7 @@ Wallet session state and drafts stay in memory and clear on page reload. Disconn
 | --- | --- | --- |
 | Testnet workspace and wallet connection | Implemented | Public address access; unsupported networks rejected |
 | Account balances and payment drafts | Implemented | Read-only balances and local validation; no funds sent |
+| Recipient account and asset readiness | In progress | Read-only Testnet account/trustline observation; pending PR review and CI |
 | Testnet transaction verification | Implemented | Deployed read-only exact-match lookup UI; no construction, signing, or submission |
 | MDX docs, search, and CI checks | Implemented | Developer documentation and automated validation |
 | Authorization model and execution contracts | In progress | Product and interface design, not an execution service |
@@ -89,7 +91,7 @@ src/app/app/           Testnet workspace UI
 src/app/docs/          MDX pages, docs layout, and search
 src/components/        Shared UI, wallet connection, and payment status
 src/wallet/            Read-only wallet adapter and types
-src/lib/stellar/       Testnet identity, balances, and read-only payment verification
+src/lib/stellar/       Testnet identity, balances, recipient readiness, and payment verification
 src/lib/payments/      Exact-decimal amounts and payment intent validation
 src/mdx-components.tsx Shared MDX component mapping
 tests/                 Unit and component tests

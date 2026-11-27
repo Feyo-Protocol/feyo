@@ -39,7 +39,7 @@ Feyo is built as a useful startup-grade product, **not a reward program demonstr
 **User outcome:** safely inspect wallet/balances, create and manage drafts, check recipient readiness and independently look up a known Testnet transaction without sending money.
 
 - [#24](https://github.com/Feyo-Protocol/feyo/issues/24): multiple **session-only** drafts with clear deletion and no fabricated persistence.
-- [#25](https://github.com/Feyo-Protocol/feyo/issues/25): recipient existence, trustline/issued-asset authorization/limits, memo and muxed-account requirements where appropriate.
+- [#25](https://github.com/Feyo-Protocol/feyo/issues/25): recipient existence and exact issued-asset trustline readiness. The current implementation branch adds a read-only Testnet account preflight with issuer matching, visible authorization flags and reported limits; it remains unmerged until CI and review pass. Memo/muxed-account requirements remain a later transaction-preparation concern.
 - **Delivered — [#28](https://github.com/Feyo-Protocol/feyo/issues/28):** exact-hash read-only verification UI, bounded timeout/cancellation, pending vs failure cases, accessible browser coverage, and genuine public Testnet observation. The issue is closed after PR #31; this does not create a submitted-payment source.
 - Mobile, accessible account/error states and clear explanation of Testnet limitations.
 

@@ -50,6 +50,33 @@ if (result.ok) {
 
 Balances remain decimal strings so no floating-point conversion occurs. Issued assets retain their asset code and issuer, and unsupported asset types (such as liquidity pool shares) are rejected as malformed rather than being given an invented identity. Tests inject a mocked `fetch`; CI requires no live network access.
 
+## Read-only Testnet recipient and trustline readiness
+
+The `/app` draft form performs a non-blocking account lookup after a valid destination address is entered. `inspectTestnetRecipientReadiness()` uses the canonical Testnet Horizon `/accounts/{account_id}` endpoint and never creates an account or trustline.
+
+- Native XLM: reports whether Horizon currently returns a funded account and its observed native balance.
+- Issued assets: requires an exact match of both asset code and issuer. A same-code trustline from another issuer is not a match.
+- When Horizon exposes them, the result reports `is_authorized`, `is_authorized_to_maintain_liabilities`, clawback status, current balance and trustline limit. It does not calculate or promise available receiving capacity.
+- A missing visible trustline is described as not visible in the account response. Issuer authorization rules can affect which trustlines Horizon exposes, so absence is not presented as definitive proof that no ledger entry exists.
+- Results distinguish funded destination, unfunded destination, trustline present, trustline missing, Horizon unavailable, malformed response, invalid request, cancelled and unknown states.
+
+Requests are locked to the canonical Stellar Testnet Horizon URL, validate public addresses and asset identity before network access, and have a complete 10-second request/response-body deadline. Destination edits and wallet/account/network context changes cancel and invalidate stale results. This is a point-in-time read-only observation, not a guarantee that a future payment will be accepted. Feyo does not create accounts, create trustlines, sign or submit transactions.
+
+```ts
+import { inspectTestnetRecipientReadiness } from "@/lib/stellar/recipient-readiness";
+
+const result = await inspectTestnetRecipientReadiness("G...", {
+  type: "issued",
+  code: "USDC",
+  issuer: "G...",
+});
+
+if (result.status === "trustline_present") {
+  // Inspect the exact code + issuer match and reported authorization/limit fields.
+  // Do not treat this observation as a payment guarantee.
+}
+```
+
 ## Read-only Testnet payment verification
 
 `verifyTestnetPayment()` is locked to the Stellar Testnet passphrase and uses the official Testnet Horizon URL by default. Its network client is injectable so CI can use deterministic evidence without funds or a live endpoint.

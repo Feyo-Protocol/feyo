@@ -252,6 +252,12 @@
     "summary": "The balance service validates a public address before any request, normalizes native and issued balances, and reports failures explicitly instead of returning partial data. It "
   },
   {
+    "href": "/docs/stellar#read-only-testnet-recipient-and-trustline-readiness",
+    "title": "Stellar",
+    "section": "Read-only Testnet recipient and trustline readiness",
+    "summary": "The /app draft form performs a non-blocking account lookup after a valid destination address is entered. inspectTestnetRecipientReadiness() uses the canonical Testnet Horizon /"
+  },
+  {
     "href": "/docs/stellar#read-only-testnet-payment-verification",
     "title": "Stellar",
     "section": "Read-only Testnet payment verification",
